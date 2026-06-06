@@ -74,6 +74,20 @@ export default function DashboardLayout({
   const [showPresetPanel, setShowPresetPanel] = useState(true);
   const [customAccounts, setCustomAccounts] = useState<MatchmakerAccount[]>([]);
   const [activeTheme, setActiveTheme] = useState<'rose' | 'midnight' | 'emerald' | 'dark'>('rose');
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [hasMoved, setHasMoved] = useState(false);
+
+  // Track mouse coordinates for interactive spotlight
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+      if (!hasMoved) setHasMoved(true);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [hasMoved]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -132,6 +146,21 @@ export default function DashboardLayout({
   };
 
   const orbs = getOrbClasses();
+
+  const getSpotlightColor = () => {
+    switch (activeTheme) {
+      case 'rose':
+        return 'rgba(244, 63, 94, 0.07)';
+      case 'midnight':
+        return 'rgba(79, 70, 229, 0.07)';
+      case 'emerald':
+        return 'rgba(16, 185, 129, 0.07)';
+      default:
+        return 'rgba(161, 161, 170, 0.07)';
+    }
+  };
+
+  const spotlightColor = getSpotlightColor();
 
   const cleanPhone = (p: string) => p.replace(/\D/g, '');
 
@@ -273,8 +302,20 @@ export default function DashboardLayout({
 
             {/* Dynamic Content View */}
             <main className="flex-1 overflow-y-auto bg-zinc-950 p-4 sm:p-6 lg:p-8 relative overflow-hidden">
-              {/* Floating animated background mesh orbs */}
+              {/* Dynamic Interactive Background System */}
               <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 select-none">
+                {/* Subtle Tech Grid Pattern */}
+                <div className="absolute inset-0 bg-grid-pattern opacity-40" />
+
+                {/* Interactive Dynamic Spotlight */}
+                <div 
+                  className={`absolute inset-0 transition-opacity duration-1000 ${hasMoved ? 'opacity-70' : 'opacity-0'}`}
+                  style={{
+                    background: `radial-gradient(650px circle at ${mousePos.x}px ${mousePos.y}px, ${spotlightColor}, transparent 80%)`
+                  }}
+                />
+
+                {/* Floating animated background mesh orbs */}
                 <div className={`absolute top-[-15%] left-[-15%] w-[600px] h-[600px] rounded-full blur-[130px] animate-orb-1 ${orbs.orb1}`} />
                 <div className={`absolute bottom-[-15%] right-[-15%] w-[700px] h-[700px] rounded-full blur-[150px] animate-orb-2 ${orbs.orb2}`} />
                 <div className={`absolute top-[35%] left-[25%] w-[500px] h-[500px] rounded-full blur-[140px] animate-orb-3 ${orbs.orb3}`} />

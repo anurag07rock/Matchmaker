@@ -63,6 +63,8 @@ export default function LoginPage() {
   
   const [showPresetPanel, setShowPresetPanel] = useState(true);
   const [customAccounts, setCustomAccounts] = useState<MatchmakerAccount[]>([]);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [hasMoved, setHasMoved] = useState(false);
 
   // Load custom accounts from localStorage
   useEffect(() => {
@@ -77,6 +79,18 @@ export default function LoginPage() {
       }
     }
   }, []);
+
+  // Track mouse coordinates for dynamic background glow
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+      if (!hasMoved) setHasMoved(true);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [hasMoved]);
 
   const cleanPhone = (p: string) => p.replace(/\D/g, '');
 
@@ -193,9 +207,27 @@ export default function LoginPage() {
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center bg-zinc-950 overflow-y-auto py-12 px-4">
-      {/* Background Neon Blurs */}
-      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-rose-500/10 blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 rounded-full bg-violet-600/10 blur-[100px] pointer-events-none" />
+      {/* Dynamic Background System */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 select-none">
+        {/* Subtle Tech Grid Pattern */}
+        <div className="absolute inset-0 bg-grid-pattern opacity-60" />
+
+        {/* Interactive Cursor Spotlight Glow */}
+        <div 
+          className={`absolute inset-0 transition-opacity duration-1000 ${hasMoved ? 'opacity-60' : 'opacity-0'}`}
+          style={{
+            background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(244, 63, 94, 0.08), rgba(139, 92, 246, 0.05), transparent 80%)`
+          }}
+        />
+
+        {/* Floating animated background mesh orbs */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full blur-[120px] animate-orb-1 bg-rose-500/10" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full blur-[130px] animate-orb-2 bg-violet-600/10" />
+          <div className="absolute top-[35%] left-[20%] w-[450px] h-[450px] rounded-full blur-[110px] animate-orb-3 bg-amber-500/5" />
+        </div>
+      </div>
+
 
       {/* Main Container */}
       <div className="w-full max-w-md z-10 space-y-6">
