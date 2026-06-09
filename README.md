@@ -180,12 +180,27 @@ The AI generates:
 ## ☁️ Deployment Instructions
 
 ### 1. Backend (Render)
-The repository includes a `render.yaml` Blueprint for automated backend deployment.
-1. Create a free PostgreSQL database on Supabase or Render.
-2. In the Render Dashboard, click **New > Blueprint**.
-3. Connect your Git repository.
-4. Render will automatically detect the `render.yaml` file and provision a Node.js Web Service.
-5. In the Render Dashboard, set the `DATABASE_URL` environment variable to your PostgreSQL connection string.
+
+Render requires a credit card on file to deploy via the `render.yaml` Blueprint. **To deploy for 100% free without entering a credit card**, follow the manual Web Service setup below (which uses the local SQLite database fallback):
+
+#### Option A: Manual Web Service (100% Free - No Card Required)
+1. In the Render Dashboard, click **New > Web Service**.
+2. Select **Build and deploy from a Git repository**, connect your GitHub account, and select this repository.
+3. On the configuration page, set the following fields:
+   * **Name**: `matchmaker-api`
+   * **Region**: Choose the region closest to you.
+   * **Branch**: `main`
+   * **Root Directory**: `server`
+   * **Runtime**: `Node`
+   * **Build Command**: `npm install && npm run build`
+   * **Start Command**: `npm start`
+4. Scroll down and make sure the **Free** instance type is selected.
+5. Click **Advanced** and add the following Environment Variables:
+   * `JWT_SECRET`: *Any random long password* (e.g. `some-secure-string-123`).
+   * `PORT`: `5000`
+   * *(Note: Leave `DATABASE_URL` blank/empty. The server will automatically use its built-in SQLite database fallback).*
+6. Click **Create Web Service**. Render will compile the TypeScript code and seed the database.
+---
 
 ### 2. Frontend (Vercel)
 1. In the Vercel Dashboard, click **Add New > Project**.
