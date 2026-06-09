@@ -2,29 +2,53 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Heart, Lock, Sparkles, Phone, Mail, Check, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Heart, Lock, Sparkles, Phone, Mail, Check, ArrowRight, ShieldCheck, Gift, Flower, Flower2 } from 'lucide-react';
+
+// Custom Teddy Bear Vector Icon for Light-Theme Background Accents
+function TeddyBear(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <circle cx="6" cy="6" r="3" />
+      <circle cx="18" cy="6" r="3" />
+      <circle cx="12" cy="12" r="6" />
+      <circle cx="9.5" cy="10.5" r="0.7" fill="currentColor" />
+      <circle cx="14.5" cy="10.5" r="0.7" fill="currentColor" />
+      <circle cx="12" cy="13.5" r="1.8" />
+      <path d="M12 12.5v1" />
+      <path d="M6.5 17c1 1.2 3 2 5.5 2s4.5-0.8 5.5-2" />
+    </svg>
+  );
+}
 
 // ─── Testing / Development credentials ────────────────────────────────────
 // Remove or gate behind process.env.NODE_ENV === 'development' in production.
 const TEST_PHONE = '666666';
-const TEST_OTP   = '777777';
+const TEST_OTP = '777777';
 // ──────────────────────────────────────────────────────────────────────────
 
 export default function LoginPage() {
   const router = useRouter();
-  
+
   // Login Method Toggle
   const [loginMethod, setLoginMethod] = useState<'email' | 'phone'>('email');
-  
+
   // Email Login States
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
+
   // Phone Login States
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [phoneStep, setPhoneStep] = useState<'input' | 'otp'>('input');
-  
+
   // Shared States
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -114,9 +138,8 @@ export default function LoginPage() {
         }
         setPhoneStep('otp');
         if (data.mockOtpForDemo) {
-          // In testing mode: autofill the OTP and surface it in the UI
-          setOtp(data.mockOtpForDemo);
-          setSuccessMsg(`- OTP auto-filled: ${data.mockOtpForDemo}`);
+          // Do not autofill the field, force the user to type it manually
+          setSuccessMsg(`Security code sent.`);
         } else {
           setSuccessMsg('Security code sent to your phone.');
         }
@@ -160,8 +183,38 @@ export default function LoginPage() {
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center bg-zinc-950 overflow-y-auto py-12 px-4 theme-light">
       {/* Subtle Background System */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 select-none">
-        <div className="absolute inset-0 bg-grid-pattern opacity-30" />
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 select-none bg-gradient-to-tr from-rose-50/60 via-zinc-50/80 to-pink-50/50">
+        <div className="absolute inset-0 bg-grid-pattern opacity-40" />
+
+        {/* Soft Light-Mode Ambient Glow Orbs */}
+        <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] rounded-full bg-rose-200/40 blur-[100px] animate-orb-1" />
+        <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[400px] h-[400px] rounded-full bg-pink-200/30 blur-[120px] animate-orb-2" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-purple-100/30 blur-[90px] animate-orb-3" />
+
+        {/* Floating Background Romantic Accents (Hearts, Gifts, Sparkles, Flowers, Teddy Bears) */}
+        {/* Left Side */}
+        <Heart className="absolute top-10 left-[8%] w-8 h-8 text-rose-300/40 rotate-12 animate-orb-1 fill-rose-300/5" />
+        <Sparkles className="absolute top-20 left-[25%] w-5 h-5 text-amber-300/35 animate-pulse" />
+        <Flower className="absolute top-[40%] left-[12%] w-7 h-7 text-rose-400/30 -rotate-12 animate-orb-2 fill-rose-400/5" />
+        <Gift className="absolute bottom-[35%] left-[6%] w-6 h-6 text-purple-300/25 rotate-45 animate-orb-3 fill-purple-300/5" />
+        <TeddyBear className="absolute bottom-[15%] left-[22%] w-7 h-7 text-amber-600/20 -rotate-12 animate-orb-1 fill-amber-600/5" />
+        <Sparkles className="absolute bottom-8 left-[10%] w-6 h-6 text-amber-300/30 animate-pulse" />
+
+        {/* Center/Transitions */}
+        <Gift className="absolute top-[8%] left-[45%] w-5 h-5 text-rose-200/30 rotate-12 animate-orb-2 fill-rose-200/5" />
+        <Flower2 className="absolute bottom-[8%] left-[40%] w-6 h-6 text-pink-300/25 -rotate-45 animate-orb-3 fill-pink-300/5" />
+
+        {/* Right Side */}
+        <Heart className="absolute top-14 right-[10%] w-9 h-9 text-rose-300/35 rotate-45 animate-orb-3 fill-rose-300/10" />
+        <TeddyBear className="absolute top-28 right-[28%] w-7 h-7 text-amber-600/20 rotate-12 animate-orb-1 fill-amber-600/5" />
+        <Sparkles className="absolute top-[45%] right-[14%] w-5 h-5 text-amber-300/35 animate-pulse" />
+        <Gift className="absolute bottom-[40%] right-[8%] w-6 h-6 text-purple-300/25 -rotate-12 animate-orb-2 fill-purple-300/5" />
+        <Heart className="absolute bottom-[20%] right-[24%] w-7 h-7 text-pink-300/30 rotate-12 animate-orb-3 fill-pink-300/5" />
+        <Sparkles className="absolute bottom-10 right-[12%] w-6 h-6 text-amber-300/30 animate-pulse" />
+        
+        {/* Center/Transitions Right */}
+        <Flower className="absolute top-[12%] right-[42%] w-6 h-6 text-rose-300/25 rotate-12 animate-orb-2 fill-rose-300/5" />
+        <Gift className="absolute bottom-[12%] right-[45%] w-5 h-5 text-purple-200/30 -rotate-12 animate-orb-1 fill-purple-200/5" />
       </div>
 
       {/* Main Container */}
@@ -183,7 +236,7 @@ export default function LoginPage() {
         {/* Form Panel */}
         <div className="bg-zinc-900 rounded-2xl p-8 shadow-lg relative border border-zinc-700">
           <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-rose-400/30 to-transparent" />
-          
+
           <h2 className="text-xl font-semibold text-zinc-100 mb-6">
             Authorized Personnel Login
           </h2>
@@ -192,21 +245,19 @@ export default function LoginPage() {
           <div className="flex bg-zinc-800/50 p-1 rounded-xl mb-6">
             <button
               onClick={() => { setLoginMethod('email'); setError(''); setSuccessMsg(''); }}
-              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-                loginMethod === 'email' 
-                  ? 'bg-zinc-700 text-zinc-100 shadow-sm' 
-                  : 'text-zinc-400 hover:text-zinc-200'
-              }`}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${loginMethod === 'email'
+                ? 'bg-zinc-700 text-zinc-100 shadow-sm'
+                : 'text-zinc-400 hover:text-zinc-200'
+                }`}
             >
               Email Login
             </button>
             <button
               onClick={() => { setLoginMethod('phone'); setError(''); setSuccessMsg(''); }}
-              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-                loginMethod === 'phone' 
-                  ? 'bg-zinc-700 text-zinc-100 shadow-sm' 
-                  : 'text-zinc-400 hover:text-zinc-200'
-              }`}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${loginMethod === 'phone'
+                ? 'bg-zinc-700 text-zinc-100 shadow-sm'
+                : 'text-zinc-400 hover:text-zinc-200'
+                }`}
             >
               Phone Login
             </button>
@@ -335,7 +386,7 @@ export default function LoginPage() {
                   <div className="space-y-2">
                     <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500 flex items-center justify-between">
                       <span>Enter 6-Digit OTP</span>
-                      <button 
+                      <button
                         type="button"
                         onClick={() => { setPhoneStep('input'); setOtp(''); setSuccessMsg(''); setError(''); }}
                         className="text-[10px] text-rose-400 hover:text-rose-300"
