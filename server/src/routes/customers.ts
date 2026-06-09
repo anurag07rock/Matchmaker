@@ -4,7 +4,7 @@ import { query } from '../db/connection';
 const router = Router();
 
 // Helper to map DB row keys (handles both SQLite camelCase and PostgreSQL lowercase folding)
-export function mapDbCustomer(row: any) {
+export function mapDbCustomer(row: any, notesArray: string[] = []) {
   if (!row) return null;
   
   const getVal = (lowerKey: string, camelKey: string) => {

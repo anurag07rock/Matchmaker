@@ -1,127 +1,175 @@
-# The Date Crew - Professional Matchmaker Dashboard CRM MVP
+# The Date Crew - Matchmaker CRM Fullstack Application
 
-An internal CRM and matchmaking dashboard designed for professional matchmakers to manage client portfolios, view comprehensive biographical data, calculate compatibility ranks, query AI-generated relationship briefs, and compose match recommendation emails.
-
----
-
-## 🚀 Tech Stack (Locked)
-
-- **Frontend**: Next.js 16 App Router (with React 19 compliance)
-- **Styling**: Tailwind CSS v4 (designed with a dark-theme-first glassmorphism aesthetic)
-- **Icons**: Lucide React
-- **Types**: Strict TypeScript
-- **Backend**: Next.js API Routes (Route Handlers)
-- **AI Engine**: OpenAI API (`gpt-4o-mini` with json format structural validation)
-- **Cache**: File-level in-memory caching mapping evaluated client pairs
+A production-ready CRM and matchmaking dashboard designed for professional matchmakers. This application manages client portfolios, calculates algorithmic compatibility, integrates AI for personalized match introductions, and runs on a robust Node.js/Express backend with a PostgreSQL database.
 
 ---
 
-## 🛠️ Setup & Installation Guide
+## 🚀 Architecture & Tech Stack
+
+### Frontend
+- **Framework**: Next.js 16 App Router (React 19)
+- **Styling**: Tailwind CSS v4 (dark-theme glassmorphism)
+- **Deployment**: Vercel
+
+### Backend
+- **Framework**: Node.js + Express.js
+- **Language**: TypeScript
+- **Database**: PostgreSQL (via `pg`) with fallback to local SQLite for development
+- **Authentication**: JWT & bcryptjs
+- **Deployment**: Render
+
+### AI Engine
+- **Provider**: OpenAI API (`gpt-4o-mini`)
+- **Features**: Generates Match Compatibility Summaries, Long-Term Potential Analyses, and Personalized Introduction Emails.
+
+---
+
+## 🛠️ Local Setup & Installation
 
 ### Prerequisites
-- Node.js (version 18.17.0 or higher recommended)
-- npm (version 9+ or higher)
+- Node.js (v18+)
+- npm (v9+)
+- (Optional) A local PostgreSQL database
 
-### 1. Installation
-Extract or clone the project files to your directory and install dependencies:
+### 1. Database & Backend Setup
+Navigate to the `server` directory and install dependencies:
+```bash
+cd server
+npm install
+```
+
+Configure Environment Variables (`server/.env`):
+```env
+# Optional: If not provided, the server falls back to local SQLite
+DATABASE_URL=your_postgresql_connection_string
+
+# Required: Secret for JWT signing
+JWT_SECRET=your_super_secret_jwt_key
+
+# Optional: Server Port (default 5000)
+PORT=5000
+```
+
+Start the backend (this will automatically seed 100+ profiles if the DB is empty):
+```bash
+npm run dev
+```
+
+### 2. Frontend Setup
+Open a new terminal in the root directory:
 ```bash
 npm install
 ```
 
-### 2. Configure Environment Variables
-Create a `.env` or `.env.local` file in the root directory and add your OpenAI credentials.
+Configure Environment Variables (`.env.local`):
 ```env
-OPENAI_API_KEY=your_openai_api_key_here
-```
-*Note: If the key is not set or the API fails, the dashboard automatically invokes a local fallback matching engine to generate rich, contextual briefings. The application will not crash.*
+# Point to your local backend server
+NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
 
-### 3. Run Development Server
-Start the local server:
+# Required for AI Match Generation
+OPENAI_API_KEY=your_openai_api_key
+```
+
+Start the frontend:
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your web browser.
 
-### 4. Build for Production
-Verify typescript compliance and build the optimized production package:
-```bash
-npm run build
-```
+Visit `http://localhost:3000` in your browser.
 
 ---
 
-## 🔑 Login Credentials
+## 🔑 Sample Login Credentials
 
-The CRM dashboard uses mock session authentication. Use the following credentials to access the main interface:
-- **Matchmaker ID**: `matchmaker`
-- **Security Password**: `password`
+Use the following seeded credentials to access the matchmaking dashboard:
 
----
-
-## 🧮 Algorithmic Matching Logic
-
-Matches are calculated programmatically inside `src/services/matching/matcher.ts` returning compatibility ratings from **0 to 100**.
-
-### Target Filters (Hard Filters)
-- **Gender Matches**: Candidates are filtered out unless they match the gender preferences of both participants.
-- **Dealbreakers**: Profiles are excluded if they violate non-negotiables (e.g. if the client has a "smoker" dealbreaker and the candidate is a smoker).
-
-### Demographic scoring (Male Clients)
-- **Gender Preference**: Candidate must be female (25 points).
-- **Age**: Candidate must be younger than the client (25 points).
-- **Height**: Candidate must be shorter than the client (25 points).
-- **Income**: Candidate must have a lower annual income than the client (25 points).
-- **Kids**: Aligned family planning preferences (25 points).
-
-### Values & Career scoring (Female Clients)
-- **Profession compatibility**: Points (up to 20) added for overlapping or complementary domains (e.g. tech/tech or medicine/medicine).
-- **Values alignment**: Points (up to 20) added for shared religion and interest intersections.
-- **Education alignment**: Points (up to 20) added if both share similar degree levels (e.g. both holding postgraduate credentials).
-- **Location proximity**: Points (up to 20) added for matching cities or relocation flexibility.
-- **Family outlook**: Points (up to 20) added for matching children desires.
+- **Email**: `maggie@thedatecrew.com`
+- **Password**: `password123`
 
 ---
 
-## 🧠 AI Usage & Briefing Engine
+## 📡 API Endpoints
 
-When a matchmaker clicks **AI Matchmaker Brief** on a match suggestion card:
-1. It queries `/api/generate-match-analysis` with the client and candidate IDs.
-2. If `OPENAI_API_KEY` is present, it issues a structured prompt returning a JSON payload parsing:
-   - **Compatibility Summary**: A 2-3 sentence counselor summary.
-   - **Relationship Potential**: Detailed evaluation of core habits.
-   - **Personalized Introduction**: A custom email pitch introducing them to each other.
-3. If no key is set or the API rate-limits, it activates the **Local Mock Analyzer** that parses client hobbies, careers, and cities to generate rich briefings dynamically.
-4. Generated briefs are cached in-memory using a file-level map matching `${clientId}_${candidateId}` to prevent redundant API queries.
+The backend provides a comprehensive RESTful API under `/api/v1`:
+
+### Auth
+- `POST /auth/login` - Authenticate and receive a JWT token.
+- `POST /auth/register` - Create a new matchmaker account.
+
+### Customers
+- `GET /customers` - Retrieve all customers and their associated notes.
+- `GET /customers/:id` - Retrieve a specific customer profile.
+- `POST /customers` - Onboard a new customer.
+- `PATCH /customers/:id` - Update customer details.
+
+### Matches
+- `GET /matches/:customerId` - Retrieve match history for a specific customer.
+- `POST /matches/propose` - Propose a new match between two customers.
+- `POST /matches/send` - Send a match recommendation (updates status to 'approved' and logs the activity).
+- `PATCH /matches/:id` - Update the status of a specific match pairing.
+- `DELETE /matches/:id` - Delete a match pairing.
+
+### Notes
+- `GET /notes/:customerId` - Retrieve matchmaker notes for a customer.
+- `POST /notes` - Add a new note (logs an activity event).
+- `PUT /notes/:id` - Edit a note.
+- `DELETE /notes/:id` - Delete a note.
 
 ---
 
-## 📝 Key Design Assumptions
+## 🧮 Matching Engine Logic
 
-1. **Local State Synchronization**: Updates to client status (e.g. Active, Paused, Matched) or newly submitted internal notes are saved in React memory state. They remain persistent during your session but reset upon browser reload, keeping the app database-ready.
-2. **Unified Height/Income Parsing**: Metric/imperial height strings (`5'11"`, `170 cm`) and income strings (`$120,000 / year`) are parsed programmatically to ensure sorting calculations are accurate.
-3. **Accessibility (A11y)**: Focus rings are customized for keyboard navigation. HTML forms, inputs, and button selectors are configured with semantic labels, unique IDs, and `aria-label` tags for screen readers.
+Matches are calculated programmatically inside `src/services/matching/matcher.ts`, returning a compatibility score out of **100**.
+
+### Hard Filters
+- **Gender Preferences**: Must align with both candidates' preferences.
+- **Dealbreakers**: Disqualifies candidates matching a client's non-negotiables (e.g., smoker, no pets).
+
+### Male Client Scoring
+- Prefers younger women (25 points).
+- Prefers candidate to be shorter (25 points).
+- Prefers candidate to have a lower income (25 points).
+- Aligned family planning / child preference (25 points).
+
+### Female Client Scoring
+- **Profession compatibility** (15 points): High score for identical or complementary fields (e.g., tech/tech).
+- **Values alignment** (15 points): Assesses religious background and shared interests.
+- **Education alignment** (15 points): Assesses if both share similar degree tiers (e.g., postgraduate).
+- **Relocation compatibility** (15 points): Checks city alignment and openness to relocation.
+- **Family outlook** (15 points): Evaluates matching desires for having children.
+- **Languages** (10 points): Overlap in spoken languages.
+- **Lifestyle** (15 points): Alignment in diet, smoking, and drinking habits.
 
 ---
 
-## ☁️ Vercel Deployment Instructions
+## 🧠 AI Integration
 
-Follow these steps to deploy your dashboard directly to Vercel:
+The platform includes a mandatory AI feature utilizing OpenAI's `gpt-4o-mini` model.
 
-1. **Initialize Git Repository** (if not already done):
-   ```bash
-   git init
-   git add .
-   git commit -m "feat: complete Date Crew Matchmaker CRM"
-   ```
-2. **Push to GitHub / GitLab / Bitbucket**:
-   - Create a repository on your Git hosting provider.
-   - Link the remote and push your branch.
-3. **Import to Vercel**:
-   - Log in to your Vercel account and click **Add New** > **Project**.
-   - Import your git repository.
-4. **Configure Environment Variables**:
-   - In Vercel's project dashboard setup, locate the **Environment Variables** section.
-   - Add `OPENAI_API_KEY` and input your OpenAI developer key.
-5. **Deploy**:
-   - Vercel automatically detects Next.js configurations. Click **Deploy**.
-   - Vercel builds the pages, tests typescript compliance, and deploys it to a production URL.
+When viewing a match recommendation, clicking **AI Matchmaker Brief** triggers a call to `/api/generate-match-analysis`.
+The AI generates:
+1. **Summary**: A professional overview of why the two clients match.
+2. **Potential Analysis**: Deep dive into long-term potential, values, and lifestyle alignment.
+3. **Introduction**: A personalized email draft from the matchmaker introducing the pair.
+
+*Note: The platform includes a seamless fallback generator. If the OpenAI API key is missing or the request fails, the system immediately generates a realistic mock brief without crashing.*
+
+---
+
+## ☁️ Deployment Instructions
+
+### 1. Backend (Render)
+The repository includes a `render.yaml` Blueprint for automated backend deployment.
+1. Create a free PostgreSQL database on Supabase or Render.
+2. In the Render Dashboard, click **New > Blueprint**.
+3. Connect your Git repository.
+4. Render will automatically detect the `render.yaml` file and provision a Node.js Web Service.
+5. In the Render Dashboard, set the `DATABASE_URL` environment variable to your PostgreSQL connection string.
+
+### 2. Frontend (Vercel)
+1. In the Vercel Dashboard, click **Add New > Project**.
+2. Import your Git repository.
+3. In the Environment Variables section, add:
+   - `NEXT_PUBLIC_API_URL`: Your deployed Render backend URL (e.g., `https://matchmaker-api.onrender.com/api/v1`).
+   - `OPENAI_API_KEY`: Your OpenAI key.
+4. Click **Deploy**. Vercel will automatically build the Next.js frontend and deploy it.

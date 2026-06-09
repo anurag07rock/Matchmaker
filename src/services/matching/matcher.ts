@@ -119,8 +119,7 @@ export function calculateCompatibility(client: Customer, candidate: Customer): C
 
   } else if (client.gender === 'female') {
     // === FEMALE CLIENT LOGIC ===
-    // 1. Profession compatibility (20 points)
-    // Overlaps if in same domain or complementary
+    // 1. Profession compatibility (15 points)
     const clientOcc = (client.occupation || '').toLowerCase();
     const candidateOcc = (candidate.occupation || '').toLowerCase();
     const isTechMatch = (clientOcc.includes('software') || clientOcc.includes('developer') || clientOcc.includes('tech') || clientOcc.includes('product') || clientOcc.includes('designer')) &&
@@ -129,15 +128,14 @@ export function calculateCompatibility(client: Customer, candidate: Customer): C
                            (candidateOcc.includes('doctor') || candidateOcc.includes('pediatrician') || candidateOcc.includes('medical') || candidateOcc.includes('clinical') || candidateOcc.includes('nurse'));
     
     if (isTechMatch || isMedicalMatch || clientOcc === candidateOcc) {
-      baseScore += 20;
+      baseScore += 15;
       pros.push(`High professional compatibility (${client.occupation} & ${candidate.occupation})`);
     } else {
-      // General professional match
-      baseScore += 12;
+      baseScore += 5;
       pros.push(`Complementary career paths (${client.occupation} & ${candidate.occupation})`);
     }
 
-    // 2. Values compatibility - Religion & Politics (20 points)
+    // 2. Values compatibility - Religion & Politics (15 points)
     let valuesScore = 0;
     if (client.religion === candidate.religion) {
       valuesScore += 10;
@@ -145,48 +143,67 @@ export function calculateCompatibility(client: Customer, candidate: Customer): C
     } else {
       cons.push(`Different religious outlooks (${client.religion} vs ${candidate.religion || 'None'})`);
     }
-    // We can also assume interests overlap count contributes
     const sharedInterests = client.interests.filter(i => candidate.interests.includes(i));
     if (sharedInterests.length >= 2) {
-      valuesScore += 10;
+      valuesScore += 5;
       pros.push(`Strong overlap in values & interests (${sharedInterests.slice(0, 2).join(', ')})`);
     } else {
-      valuesScore += 5;
+      valuesScore += 2;
     }
     baseScore += valuesScore;
 
-    // 3. Education compatibility (20 points)
-    // Check if both hold postgraduate degrees (Ph.D., MBA, J.D., M.D., M.S.)
+    // 3. Education compatibility (15 points)
     const clientEdu = (client.degree || '').toLowerCase();
     const candidateEdu = (candidate.degree || '').toLowerCase();
     const clientHasGrad = clientEdu.includes('phd') || clientEdu.includes('mba') || clientEdu.includes('jd') || clientEdu.includes('md') || clientEdu.includes('m.s') || clientEdu.includes('master');
     const candidateHasGrad = candidateEdu.includes('phd') || candidateEdu.includes('mba') || candidateEdu.includes('jd') || candidateEdu.includes('md') || candidateEdu.includes('m.s') || candidateEdu.includes('master');
     
     if (clientHasGrad === candidateHasGrad) {
-      baseScore += 20;
+      baseScore += 15;
       pros.push(`Matched academic accomplishments (${client.degree} & ${candidate.degree})`);
     } else {
-      baseScore += 10;
+      baseScore += 5;
       cons.push(`Academic divergence (${client.degree} vs ${candidate.degree})`);
     }
 
-    // 4. Relocation compatibility (20 points)
+    // 4. Relocation compatibility (15 points)
     if (client.city === candidate.city) {
-      baseScore += 20;
+      baseScore += 15;
       pros.push(`Same metropolitan area (${client.city})`);
     } else if (client.openToRelocate === 'yes' || client.openToRelocate === 'open' || candidate.openToRelocate === 'yes' || candidate.openToRelocate === 'open') {
-      baseScore += 15;
+      baseScore += 10;
       pros.push(`Open to relocation bounds`);
     } else {
       cons.push(`Geographical friction (Different cities, not open to relocate)`);
     }
 
-    // 5. Child preference compatibility (20 points)
+    // 5. Family expectations compatibility (15 points)
     if (client.wantKids === candidate.wantKids) {
-      baseScore += 20;
+      baseScore += 15;
       pros.push(`Aligned family planning outlook ("${client.wantKids}")`);
     } else {
       cons.push(`Divergent views on kids: ${client.firstName} wants "${client.wantKids}", ${candidate.firstName} wants "${candidate.wantKids}"`);
+    }
+
+    // 6. Languages compatibility (10 points)
+    const sharedLanguages = client.languages.filter(l => candidate.languages.includes(l));
+    if (sharedLanguages.length > 0) {
+      baseScore += 10;
+      pros.push(`Shared spoken languages (${sharedLanguages.join(', ')})`);
+    } else {
+      cons.push(`No overlapping languages`);
+    }
+
+    // 7. Lifestyle (Diet, Smoking, Drinking) compatibility (15 points)
+    let lifestyleScore = 0;
+    if (client.diet === candidate.diet) lifestyleScore += 5;
+    if (client.smoking === candidate.smoking) lifestyleScore += 5;
+    if (client.drinking === candidate.drinking) lifestyleScore += 5;
+    baseScore += lifestyleScore;
+    if (lifestyleScore >= 10) {
+      pros.push(`Aligned lifestyle preferences (Diet/Smoking/Drinking)`);
+    } else if (lifestyleScore <= 5) {
+      cons.push(`Differing lifestyle habits`);
     }
 
   } else {

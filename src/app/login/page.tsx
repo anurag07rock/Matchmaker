@@ -2,85 +2,38 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Heart, Lock, Sparkles, Phone, Mail, User, Check, ChevronDown, ChevronUp } from 'lucide-react';
+import { Heart, Lock, Sparkles, Phone, Mail, Check, ArrowRight, ShieldCheck } from 'lucide-react';
 
-interface MatchmakerAccount {
-  email: string;
-  phone: string;
-  password: string;
-  name: string;
-  title: string;
-  theme: 'light' | 'dark';
-}
-
-const PRESET_ACCOUNTS: MatchmakerAccount[] = [
-  {
-    email: 'maggie@thedatecrew.com',
-    phone: '+1 555-0199',
-    password: 'password123',
-    name: 'Maggie Crew',
-    title: 'Senior Matchmaker',
-    theme: 'light'
-  },
-  {
-    email: 'william@thedatecrew.com',
-    phone: '+1 555-0188',
-    password: 'password456',
-    name: 'William Sterling',
-    title: 'Lead Matchmaker',
-    theme: 'dark'
-  },
-  {
-    email: 'chloe@thedatecrew.com',
-    phone: '+1 555-0177',
-    password: 'password789',
-    name: 'Chloe Valance',
-    title: 'Associate Matchmaker',
-    theme: 'light'
-  },
-  {
-    email: 'alex@thedatecrew.com',
-    phone: '+1 555-0166',
-    password: 'password321',
-    name: 'Alex Thorne',
-    title: 'Matchmaking Agent',
-    theme: 'dark'
-  }
-];
+// ─── Testing / Development credentials ────────────────────────────────────
+// Remove or gate behind process.env.NODE_ENV === 'development' in production.
+const TEST_PHONE = '666666';
+const TEST_OTP   = '777777';
+// ──────────────────────────────────────────────────────────────────────────
 
 export default function LoginPage() {
   const router = useRouter();
-  const [emailOrPhone, setEmailOrPhone] = useState('maggie@thedatecrew.com');
+  
+  // Login Method Toggle
+  const [loginMethod, setLoginMethod] = useState<'email' | 'phone'>('email');
+  
+  // Email Login States
+  const [email, setEmail] = useState('maggie@thedatecrew.com');
   const [password, setPassword] = useState('password123');
+  
+  // Phone Login States
+  const [phone, setPhone] = useState(TEST_PHONE);
+  const [otp, setOtp] = useState('');
+  const [phoneStep, setPhoneStep] = useState<'input' | 'otp'>('input');
+  
+  // Shared States
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  // Registration flow states
-  const [showRegister, setShowRegister] = useState(false);
-  const [newName, setNewName] = useState('');
-  const [newTitle, setNewTitle] = useState('');
-  const [newTheme, setNewTheme] = useState<'light' | 'dark'>('light');
-  
-  const [showPresetPanel, setShowPresetPanel] = useState(true);
-  const [customAccounts, setCustomAccounts] = useState<MatchmakerAccount[]>([]);
+  const [successMsg, setSuccessMsg] = useState('');
+
+  // Track mouse coordinates for dynamic background glow
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [hasMoved, setHasMoved] = useState(false);
 
-  // Load custom accounts from localStorage
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('matchmaker_custom_accounts');
-      if (saved) {
-        try {
-          setCustomAccounts(JSON.parse(saved));
-        } catch (e) {
-          // ignore
-        }
-      }
-    }
-  }, []);
-
-  // Track mouse coordinates for dynamic background glow
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       setMousePos({ x: e.clientX, y: e.clientY });
@@ -92,9 +45,26 @@ export default function LoginPage() {
     };
   }, [hasMoved]);
 
-  const cleanPhone = (p: string) => p.replace(/\D/g, '');
+  const handleAuthSuccess = (data: any) => {
+    const user = data.user;
+    const updatedSettings = {
+      promptTone: 'detailed and analytical',
+      maxDistance: 50,
+      ageRangeLeniency: 2,
+      apiKey: '••••••••••••••••••••••••••••••••',
+      name: user.name,
+      title: user.title,
+      notifications: { email: true, push: false, alerts: true },
+      theme: user.theme || 'light',
+      email: user.email,
+      phone: user.phone
+    };
+    localStorage.setItem('matchmaker_settings', JSON.stringify(updatedSettings));
+    document.cookie = "auth_session=true; path=/; max-age=86400; SameSite=Lax";
+    router.push('/dashboard');
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleEmailLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
@@ -104,37 +74,16 @@ export default function LoginPage() {
     fetch(`${API_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ emailOrPhone, password })
+      body: JSON.stringify({ email, password })
     })
       .then(async (res) => {
         const data = await res.json();
         if (!res.ok) {
-          if (res.status === 404) {
-            setShowRegister(true);
-            setIsLoading(false);
-          } else {
-            setError(data.error || 'Security password mismatch. Please verify and try again.');
-            setIsLoading(false);
-          }
+          setError(data.error || 'Security password mismatch. Please verify and try again.');
+          setIsLoading(false);
           return;
         }
-
-        const user = data.user;
-        const updatedSettings = {
-          promptTone: 'detailed and analytical',
-          maxDistance: 50,
-          ageRangeLeniency: 2,
-          apiKey: '••••••••••••••••••••••••••••••••',
-          name: user.name,
-          title: user.title,
-          notifications: { email: true, push: false, alerts: true },
-          theme: user.theme || 'light',
-          email: user.email,
-          phone: user.phone
-        };
-        localStorage.setItem('matchmaker_settings', JSON.stringify(updatedSettings));
-        document.cookie = "auth_session=true; path=/; max-age=86400; SameSite=Lax";
-        router.push('/dashboard');
+        handleAuthSuccess(data);
       })
       .catch((err) => {
         console.error('Login error:', err);
@@ -143,93 +92,87 @@ export default function LoginPage() {
       });
   };
 
-  const handleRegisterSubmit = (e: React.FormEvent) => {
+  const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newName.trim()) {
-      setError('Please provide your full name to set up your profile.');
-      return;
-    }
-
     setIsLoading(true);
     setError('');
+    setSuccessMsg('');
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
-    const queryStr = emailOrPhone.trim();
-    const isEmail = queryStr.includes('@');
 
-    const payload = {
-      email: isEmail ? queryStr.toLowerCase() : `${newName.toLowerCase().replace(/\s+/g, '')}@thedatecrew.com`,
-      phone: isEmail ? '+1 555-0100' : queryStr,
-      password: password,
-      name: newName,
-      title: newTitle || 'Matchmaking Agent',
-      theme: newTheme
-    };
-
-    fetch(`${API_URL}/auth/register`, {
+    fetch(`${API_URL}/auth/phone-login/send-otp`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({ phone })
     })
       .then(async (res) => {
         const data = await res.json();
         if (!res.ok) {
-          setError(data.error || 'Registration failed.');
+          setError(data.error || 'Failed to send OTP.');
           setIsLoading(false);
           return;
         }
-
-        const user = data.user;
-        const updatedSettings = {
-          promptTone: 'detailed and analytical',
-          maxDistance: 50,
-          ageRangeLeniency: 2,
-          apiKey: '••••••••••••••••••••••••••••••••',
-          name: user.name,
-          title: user.title,
-          notifications: { email: true, push: false, alerts: true },
-          theme: user.theme || 'light',
-          email: user.email,
-          phone: user.phone
-        };
-        localStorage.setItem('matchmaker_settings', JSON.stringify(updatedSettings));
-        document.cookie = "auth_session=true; path=/; max-age=86400; SameSite=Lax";
-        router.push('/dashboard');
+        setPhoneStep('otp');
+        if (data.mockOtpForDemo) {
+          // In testing mode: autofill the OTP and surface it in the UI
+          setOtp(data.mockOtpForDemo);
+          setSuccessMsg(`- OTP auto-filled: ${data.mockOtpForDemo}`);
+        } else {
+          setSuccessMsg('Security code sent to your phone.');
+        }
+        setIsLoading(false);
       })
       .catch((err) => {
-        console.error('Registration error:', err);
+        console.error('OTP error:', err);
         setError('Failed to connect to authentication server.');
         setIsLoading(false);
       });
   };
 
-  const autofill = (acc: MatchmakerAccount) => {
-    setEmailOrPhone(acc.email);
-    setPassword(acc.password);
+  const handleVerifyOtp = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
     setError('');
-    setShowRegister(false);
+
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+
+    fetch(`${API_URL}/auth/phone-login/verify-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, otp })
+    })
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data.error || 'Invalid OTP.');
+          setIsLoading(false);
+          return;
+        }
+        handleAuthSuccess(data);
+      })
+      .catch((err) => {
+        console.error('OTP verify error:', err);
+        setError('Failed to connect to authentication server.');
+        setIsLoading(false);
+      });
   };
 
-  const loginThemeClass = showRegister ? `theme-${newTheme}` : `theme-light`;
-
   return (
-    <div className={`relative min-h-screen flex flex-col items-center justify-center bg-zinc-950 overflow-y-auto py-12 px-4 ${loginThemeClass}`}>
+    <div className="relative min-h-screen flex flex-col items-center justify-center bg-zinc-950 overflow-y-auto py-12 px-4 theme-light">
       {/* Subtle Background System */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 select-none">
-        {/* Very faint grid pattern */}
         <div className="absolute inset-0 bg-grid-pattern opacity-30" />
       </div>
-
 
       {/* Main Container */}
       <div className="w-full max-w-md z-10 space-y-6">
         {/* Logo Header */}
         <div className="text-center flex flex-col items-center">
-          <div className="relative flex items-center justify-center w-14 h-14 rounded-2xl bg-white border border-zinc-200 shadow-lg mb-4 group hover:border-rose-400/60 hover:shadow-rose-100 transition-all duration-300">
+          <div className="relative flex items-center justify-center w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-700 shadow-lg mb-4 group hover:border-rose-400/60 hover:shadow-rose-100 transition-all duration-300">
             <Heart className="w-6 h-6 text-rose-500 group-hover:scale-110 transition-transform duration-300 fill-rose-500/20" />
             <Sparkles className="w-3.5 h-3.5 text-rose-400 absolute top-2 right-2 animate-pulse" />
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-zinc-800">
+          <h1 className="text-3xl font-extrabold tracking-tight text-zinc-100">
             The Date Crew
           </h1>
           <p className="text-sm text-zinc-500 mt-2 font-medium">
@@ -238,49 +181,74 @@ export default function LoginPage() {
         </div>
 
         {/* Form Panel */}
-        <div className="bg-white rounded-2xl p-8 shadow-lg relative border border-zinc-200">
+        <div className="bg-zinc-900 rounded-2xl p-8 shadow-lg relative border border-zinc-700">
           <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-rose-400/30 to-transparent" />
           
-          <h2 className="text-xl font-semibold text-zinc-800 mb-6">
-            {showRegister ? 'Create Matchmaker Account' : 'Authorized Personnel Login'}
+          <h2 className="text-xl font-semibold text-zinc-100 mb-6">
+            Authorized Personnel Login
           </h2>
 
+          {/* Login Method Toggle */}
+          <div className="flex bg-zinc-800/50 p-1 rounded-xl mb-6">
+            <button
+              onClick={() => { setLoginMethod('email'); setError(''); setSuccessMsg(''); }}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
+                loginMethod === 'email' 
+                  ? 'bg-zinc-700 text-zinc-100 shadow-sm' 
+                  : 'text-zinc-400 hover:text-zinc-200'
+              }`}
+            >
+              Email Login
+            </button>
+            <button
+              onClick={() => { setLoginMethod('phone'); setError(''); setSuccessMsg(''); }}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
+                loginMethod === 'phone' 
+                  ? 'bg-zinc-700 text-zinc-100 shadow-sm' 
+                  : 'text-zinc-400 hover:text-zinc-200'
+              }`}
+            >
+              Phone Login
+            </button>
+          </div>
+
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 mb-5 animate-fadeIn">
+            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 mb-5 animate-fadeIn">
               {error}
             </div>
           )}
 
-          {!showRegister ? (
-            /* Login Form */
-            <form onSubmit={handleSubmit} className="space-y-5">
+          {successMsg && (
+            <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-400 mb-5 animate-fadeIn">
+              {successMsg}
+            </div>
+          )}
+
+          {/* EMAIL LOGIN FORM */}
+          {loginMethod === 'email' && (
+            <form onSubmit={handleEmailLogin} className="space-y-5">
               <div className="space-y-2">
                 <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500 flex items-center justify-between">
-                  <span>Email or Phone Number</span>
-                  <span className="text-[10px] text-zinc-400">Preset / Custom</span>
+                  <span>Email Address</span>
                 </label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
-                    {emailOrPhone.includes('@') ? (
-                      <Mail className="w-4 h-4" />
-                    ) : (
-                      <Phone className="w-4 h-4" />
-                    )}
+                    <Mail className="w-4 h-4" />
                   </span>
                   <input
-                    type="text"
+                    type="email"
                     required
-                    value={emailOrPhone}
-                    onChange={(e) => setEmailOrPhone(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-zinc-200 rounded-xl text-zinc-800 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-rose-400 focus:border-rose-400/60 transition-all duration-200 text-sm"
-                    placeholder="name@thedatecrew.com or +1 555-..."
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-rose-500 focus:border-rose-500/50 transition-all duration-200 text-sm"
+                    placeholder="name@thedatecrew.com"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                  Security Password
+                  Password
                 </label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
@@ -291,7 +259,7 @@ export default function LoginPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-zinc-200 rounded-xl text-zinc-800 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-rose-400 focus:border-rose-400/60 transition-all duration-200 text-sm"
+                    className="w-full pl-10 pr-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-rose-500 focus:border-rose-500/50 transition-all duration-200 text-sm"
                     placeholder="Enter security password"
                   />
                 </div>
@@ -306,195 +274,116 @@ export default function LoginPage() {
                   {isLoading ? (
                     <span className="flex items-center justify-center gap-2">
                       <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Authenticating credentials...
+                      Authenticating...
                     </span>
                   ) : (
                     <span className="flex items-center justify-center gap-1">
                       Enter Dashboard
-                      <Sparkles className="w-4 h-4 ml-1 opacity-80 group-hover:scale-110 transition-transform duration-200" />
+                      <ArrowRight className="w-4 h-4 ml-1 opacity-80 group-hover:translate-x-1 transition-transform duration-200" />
                     </span>
                   )}
                 </button>
               </div>
             </form>
-          ) : (
-            /* Registration Form */
-            <form onSubmit={handleRegisterSubmit} className="space-y-5">
-              <div className="p-3 bg-rose-950/15 border border-rose-500/20 rounded-xl text-xs text-rose-300">
-                It looks like this email/phone is not in the system yet. Please fill in your name and role below to register your Matchmaker profile.
-              </div>
+          )}
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Username/Identity</label>
-                  <div className="text-xs text-zinc-300 font-mono mt-1 truncate bg-zinc-900/80 p-2 border border-zinc-850 rounded-lg select-none">
-                    {emailOrPhone}
+          {/* PHONE LOGIN FORM */}
+          {loginMethod === 'phone' && (
+            <>
+              {phoneStep === 'input' ? (
+                <form onSubmit={handleSendOtp} className="space-y-5">
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500 flex items-center justify-between">
+                      <span>Phone Number</span>
+                    </label>
+                    <div className="relative">
+                      <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
+                        <Phone className="w-4 h-4" />
+                      </span>
+                      <input
+                        type="text"
+                        required
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-rose-500 focus:border-rose-500/50 transition-all duration-200 text-sm"
+                        placeholder="+1 555-0100"
+                      />
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Security Password</label>
-                  <div className="text-xs text-zinc-300 font-mono mt-1 truncate bg-zinc-900/80 p-2 border border-zinc-850 rounded-lg select-none">
-                    ••••••••
-                  </div>
-                </div>
-              </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-500">
-                    <User className="w-4 h-4" />
-                  </span>
-                  <input
-                    type="text"
-                    required
-                    value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/60 border border-zinc-800 rounded-xl text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-rose-500 focus:border-rose-500/50 transition-all duration-200 text-sm"
-                    placeholder="e.g. John Doe"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-                  Role / Title
-                </label>
-                <input
-                  type="text"
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-zinc-900/60 border border-zinc-800 rounded-xl text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-rose-500 focus:border-rose-500/50 transition-all duration-200 text-sm"
-                  placeholder="e.g. Associate Matchmaker"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-                  Dashboard Theme Color
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {(['light', 'dark'] as const).map((t) => (
+                  <div className="pt-2">
                     <button
-                      key={t}
-                      type="button"
-                      onClick={() => setNewTheme(t)}
-                      className={`py-2 text-xs font-semibold rounded-xl border transition-all capitalize select-none ${
-                        newTheme === t
-                          ? 'bg-rose-500/10 border-rose-500 text-rose-450'
-                          : 'bg-zinc-900/40 border-zinc-850 text-zinc-500 hover:text-zinc-300 hover:border-zinc-700'
-                      }`}
+                      type="submit"
+                      disabled={isLoading}
+                      className="relative w-full py-3 bg-gradient-to-r from-zinc-700 to-zinc-600 text-white rounded-xl text-sm font-semibold hover:from-zinc-600 hover:to-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500/50 active:scale-[0.98] transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden shadow-lg group"
                     >
-                      {t === 'light' ? 'Light Mode' : 'Dark Mode'}
+                      {isLoading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Sending Code...
+                        </span>
+                      ) : (
+                        <span className="flex items-center justify-center gap-1">
+                          Send Security Code
+                        </span>
+                      )}
                     </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowRegister(false)}
-                  className="flex-1 py-2.5 bg-zinc-900 hover:bg-zinc-850 text-zinc-300 border border-zinc-800 rounded-xl text-sm font-semibold transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="flex-1 py-2.5 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-1.5"
-                >
-                  {isLoading ? (
-                    <>
-                      <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Registering...
-                    </>
-                  ) : (
-                    <>
-                      Register & Login
-                      <Check className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          )}
-        </div>
-
-        {/* Accordion List of Available Accounts for quick reference */}
-        <div className="glass-panel rounded-2xl border-zinc-200/80 shadow-sm overflow-hidden">
-          <button
-            onClick={() => setShowPresetPanel(!showPresetPanel)}
-            className="w-full px-6 py-4 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-zinc-500 hover:text-zinc-700 transition-colors select-none focus:outline-none"
-          >
-            <span className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-rose-500" />
-              Quick-Fill Demo Matchmakers
-            </span>
-            {showPresetPanel ? (
-              <ChevronUp className="w-4 h-4 text-zinc-500" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-zinc-500" />
-            )}
-          </button>
-
-          {showPresetPanel && (
-            <div className="px-6 pb-4 border-t border-zinc-100 divide-y divide-zinc-100">
-              {PRESET_ACCOUNTS.map((acc) => (
-                <div
-                  key={acc.email}
-                  className="py-3 flex items-center justify-between gap-3 text-xs"
-                >
-                  <div>
-                    <p className="font-bold text-zinc-700">{acc.name}</p>
-                    <p className="text-[10px] text-zinc-500">{acc.title}</p>
-                    <div className="flex gap-3 text-[10px] text-zinc-400 font-mono mt-0.5">
-                      <span>{acc.email}</span>
-                      <span>•</span>
-                      <span>{acc.phone}</span>
+                  </div>
+                </form>
+              ) : (
+                <form onSubmit={handleVerifyOtp} className="space-y-5">
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500 flex items-center justify-between">
+                      <span>Enter 6-Digit OTP</span>
+                      <button 
+                        type="button"
+                        onClick={() => { setPhoneStep('input'); setOtp(''); setSuccessMsg(''); setError(''); }}
+                        className="text-[10px] text-rose-400 hover:text-rose-300"
+                      >
+                        Change Number
+                      </button>
+                    </label>
+                    <div className="relative">
+                      <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
+                        <Lock className="w-4 h-4" />
+                      </span>
+                      <input
+                        type="text"
+                        required
+                        maxLength={6}
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                        className="w-full pl-10 pr-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-rose-500 focus:border-rose-500/50 transition-all duration-200 text-center tracking-[0.5em] text-lg font-mono"
+                        placeholder="••••••"
+                      />
                     </div>
                   </div>
-                  <button
-                    onClick={() => autofill(acc)}
-                    className="px-2.5 py-1 bg-white border border-zinc-200 hover:bg-rose-50 hover:border-rose-300 text-zinc-600 hover:text-rose-600 rounded-lg font-semibold tracking-wide transition-all scale-95 active:scale-90 select-none focus:outline-none"
-                  >
-                    Quick Fill
-                  </button>
-                </div>
-              ))}
 
-              {customAccounts.length > 0 && (
-                <div className="pt-2">
-                  <p className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider mb-2">Registered Customs</p>
-                  {customAccounts.map((acc) => (
-                    <div
-                      key={acc.email}
-                      className="py-2 flex items-center justify-between gap-3 text-xs border-t border-zinc-900/50"
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={isLoading || otp.length < 6}
+                      className="relative w-full py-3 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-xl text-sm font-semibold hover:from-rose-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-rose-500/50 active:scale-[0.98] transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden shadow-lg shadow-rose-950/20 group"
                     >
-                      <div>
-                        <p className="font-bold text-rose-400/80">{acc.name} <span className="text-[9px] text-zinc-500 font-normal border border-zinc-800 px-1 rounded ml-1">Custom</span></p>
-                        <div className="flex gap-3 text-[10px] text-zinc-500 font-mono">
-                          <span>{acc.email}</span>
-                          <span>•</span>
-                          <span>{acc.phone}</span>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => autofill(acc)}
-                        className="px-2.5 py-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 text-zinc-300 hover:text-zinc-100 rounded-lg font-semibold transition-all scale-95 select-none focus:outline-none"
-                      >
-                        Fill
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                      {isLoading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Verifying...
+                        </span>
+                      ) : (
+                        <span className="flex items-center justify-center gap-1">
+                          Verify & Login
+                          <Check className="w-4 h-4 ml-1 opacity-80" />
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                </form>
               )}
-            </div>
+            </>
           )}
-        </div>
 
+        </div>
       </div>
     </div>
   );

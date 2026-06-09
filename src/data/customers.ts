@@ -1136,7 +1136,7 @@ function generateExtraCustomers(count: number): Customer[] {
       id,
       firstName,
       lastName,
-      email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@email.com`,
+      email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${i}@email.com`,
       phone: `555-${2000 + i}`,
       avatarUrl: `https://images.unsplash.com/photo-${1500000000000 + (i * 200000)}?w=150`,
       status,
