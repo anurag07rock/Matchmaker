@@ -213,7 +213,7 @@ export default function LoginPage() {
         <Gift className="absolute bottom-[40%] right-[8%] w-6 h-6 text-purple-300/25 -rotate-12 animate-orb-2 fill-purple-300/5" />
         <Heart className="absolute bottom-[20%] right-[24%] w-7 h-7 text-pink-300/30 rotate-12 animate-orb-3 fill-pink-300/5" />
         <Sparkles className="absolute bottom-10 right-[12%] w-6 h-6 text-amber-300/30 animate-pulse" />
-        
+
         {/* Center/Transitions Right */}
         <Flower className="absolute top-[12%] right-[42%] w-6 h-6 text-rose-300/25 rotate-12 animate-orb-2 fill-rose-300/5" />
         <Gift className="absolute bottom-[12%] right-[45%] w-5 h-5 text-purple-200/30 -rotate-12 animate-orb-1 fill-purple-200/5" />

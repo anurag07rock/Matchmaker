@@ -81,7 +81,7 @@ export async function seed() {
       // Add dynamic horoscope and verificationStatus
       const hIndex = Math.abs(c.id.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0)) % HOROSCOPES.length;
       const vIndex = Math.abs(c.id.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0)) % VERIFICATION_STATUSES.length;
-      
+
       const horoscope = c.horoscope || HOROSCOPES[hIndex];
       const verificationStatus = c.verificationStatus || VERIFICATION_STATUSES[vIndex];
 

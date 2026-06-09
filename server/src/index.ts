@@ -49,7 +49,7 @@ async function startServer() {
     // 3. Auto-seed if the database is brand new (no users exist)
     const userCheck = await query('SELECT COUNT(*) as count FROM users');
     const userCount = Number(userCheck.rows[0]?.count || 0);
-    
+
     if (userCount === 0) {
       console.log('Database appears empty. Running auto-seeder...');
       await seed();

@@ -66,13 +66,13 @@ export default function DashboardLayout({
   const [password, setPassword] = useState('password123');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   // Registration flow states
   const [showRegister, setShowRegister] = useState(false);
   const [newName, setNewName] = useState('');
   const [newTitle, setNewTitle] = useState('');
   const [newTheme, setNewTheme] = useState<'light' | 'dark'>('light');
-  
+
   const [showPresetPanel, setShowPresetPanel] = useState(true);
   const [customAccounts, setCustomAccounts] = useState<MatchmakerAccount[]>([]);
   const [activeTheme, setActiveTheme] = useState<'light' | 'dark'>('light');
@@ -104,7 +104,7 @@ export default function DashboardLayout({
           if (parsed.theme) {
             setActiveTheme(parsed.theme);
           }
-        } catch (e) {}
+        } catch (e) { }
       }
 
       const saved = localStorage.getItem('matchmaker_custom_accounts');
@@ -280,7 +280,7 @@ export default function DashboardLayout({
   return (
     <AppContextProvider>
       <div className={`relative flex h-screen w-screen overflow-hidden bg-[var(--background)] theme-${activeTheme}`}>
-        
+
         {/* Main Dashboard Layout (Blurred if not logged in) */}
         <div className={`flex flex-1 min-w-0 overflow-hidden transition-all duration-500 ${!hasSession ? 'blur-md pointer-events-none select-none' : ''}`}>
           {/* Sidebar Navigation */}
@@ -299,7 +299,7 @@ export default function DashboardLayout({
                 <div className="absolute inset-0 bg-grid-pattern opacity-40" />
 
                 {/* Interactive Dynamic Spotlight */}
-                <div 
+                <div
                   className={`absolute inset-0 transition-opacity duration-1000 ${hasMoved ? 'opacity-70' : 'opacity-0'}`}
                   style={{
                     background: `radial-gradient(650px circle at ${mousePos.x}px ${mousePos.y}px, ${spotlightColor}, transparent 80%)`
@@ -311,7 +311,7 @@ export default function DashboardLayout({
                 <div className={`absolute bottom-[-15%] right-[-15%] w-[700px] h-[700px] rounded-full blur-[150px] animate-orb-2 ${orbs.orb2}`} />
                 <div className={`absolute top-[35%] left-[25%] w-[500px] h-[500px] rounded-full blur-[140px] animate-orb-3 ${orbs.orb3}`} />
               </div>
-              
+
               <div className="relative z-10 w-full max-w-7xl mx-auto space-y-6">
                 {children}
               </div>
@@ -323,7 +323,7 @@ export default function DashboardLayout({
         {!hasSession && (
           <div className="fixed inset-0 z-[999] bg-zinc-950/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
             <div className="w-full max-w-md my-8 space-y-6">
-              
+
               {/* Logo Header */}
               <div className="text-center flex flex-col items-center">
                 <div className="relative flex items-center justify-center w-14 h-14 rounded-2xl bg-zinc-900/80 border border-zinc-800 shadow-xl mb-4 group hover:border-rose-500/50 transition-all duration-300">
@@ -341,7 +341,7 @@ export default function DashboardLayout({
               {/* Form Panel */}
               <div className="glass-panel rounded-2xl p-8 shadow-2xl relative border-zinc-800/80 bg-zinc-900">
                 <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-rose-500/20 to-transparent" />
-                
+
                 <h2 className="text-xl font-semibold text-zinc-100 mb-6">
                   {showRegister ? 'Create Matchmaker Account' : 'Authorized Personnel Login'}
                 </h2>
@@ -482,11 +482,10 @@ export default function DashboardLayout({
                             key={t}
                             type="button"
                             onClick={() => setNewTheme(t)}
-                            className={`py-2 text-xs font-semibold rounded-xl border transition-all capitalize select-none ${
-                              newTheme === t
-                                ? 'bg-rose-500/10 border-rose-500 text-rose-400'
-                                : 'bg-zinc-900/40 border-zinc-850 text-zinc-500 hover:text-zinc-300 hover:border-zinc-700'
-                            }`}
+                            className={`py-2 text-xs font-semibold rounded-xl border transition-all capitalize select-none ${newTheme === t
+                              ? 'bg-rose-500/10 border-rose-500 text-rose-400'
+                              : 'bg-zinc-900/40 border-zinc-850 text-zinc-500 hover:text-zinc-300 hover:border-zinc-700'
+                              }`}
                           >
                             {t === 'light' ? 'Light Mode' : 'Dark Mode'}
                           </button>
