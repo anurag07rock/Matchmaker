@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Heart, Lock, Sparkles, Phone, Mail, Check, ArrowRight, ShieldCheck, Gift, Flower, Flower2 } from 'lucide-react';
+import { getApiUrl } from '@/lib/utils';
+
 
 // Custom Teddy Bear Vector Icon for Light-Theme Background Accents
 function TeddyBear(props: React.SVGProps<SVGSVGElement>) {
@@ -93,7 +95,7 @@ export default function LoginPage() {
     setIsLoading(true);
     setError('');
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+    const API_URL = getApiUrl();
 
     fetch(`${API_URL}/auth/login`, {
       method: 'POST',
@@ -122,7 +124,7 @@ export default function LoginPage() {
     setError('');
     setSuccessMsg('');
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+    const API_URL = getApiUrl();
 
     fetch(`${API_URL}/auth/phone-login/send-otp`, {
       method: 'POST',
@@ -157,7 +159,7 @@ export default function LoginPage() {
     setIsLoading(true);
     setError('');
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+    const API_URL = getApiUrl();
 
     fetch(`${API_URL}/auth/phone-login/verify-otp`, {
       method: 'POST',

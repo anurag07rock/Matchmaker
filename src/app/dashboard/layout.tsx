@@ -5,6 +5,8 @@ import Sidebar from '@/components/layout/sidebar';
 import Navbar from '@/components/layout/navbar';
 import { AppContextProvider } from '@/context/AppContext';
 import { Heart, Lock, Sparkles, Phone, Mail, User, Check, ChevronDown, ChevronUp } from 'lucide-react';
+import { getApiUrl } from '@/lib/utils';
+
 
 interface MatchmakerAccount {
   email: string;
@@ -153,7 +155,7 @@ export default function DashboardLayout({
     setIsLoading(true);
     setError('');
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+    const API_URL = getApiUrl();
 
     fetch(`${API_URL}/auth/login`, {
       method: 'POST',
@@ -207,7 +209,7 @@ export default function DashboardLayout({
     setIsLoading(true);
     setError('');
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+    const API_URL = getApiUrl();
     const queryStr = emailOrPhone.trim();
     const isEmail = queryStr.includes('@');
 

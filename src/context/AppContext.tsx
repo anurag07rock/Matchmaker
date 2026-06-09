@@ -6,6 +6,8 @@ import { Match, MatchStatus } from '@/types/match';
 import { mockCustomers as initialCustomers } from '@/data/customers';
 import { mockMatches as initialMatches } from '@/data/matches';
 import { calculateCompatibility } from '@/services/matching/matcher';
+import { getApiUrl } from '@/lib/utils';
+
 
 export interface RichNote {
   id: string;
@@ -103,7 +105,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   });
   const [initialized, setInitialized] = useState(false);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+  const API_URL = getApiUrl();
 
   // Load state from backend on mount
   useEffect(() => {
