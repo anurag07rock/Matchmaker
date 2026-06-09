@@ -17,11 +17,11 @@ export default function LoginPage() {
   const [loginMethod, setLoginMethod] = useState<'email' | 'phone'>('email');
   
   // Email Login States
-  const [email, setEmail] = useState('maggie@thedatecrew.com');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   
   // Phone Login States
-  const [phone, setPhone] = useState(TEST_PHONE);
+  const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [phoneStep, setPhoneStep] = useState<'input' | 'otp'>('input');
   

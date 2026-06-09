@@ -3,7 +3,10 @@ import { mockCustomers } from '@/data/customers';
 import { calculateCompatibility } from '@/services/matching/matcher';
 import { Customer } from '@/types/customer';
 
-// In-memory runtime cache for analyzed pairs
+// ─────────────────────────────────────────────────────────────────────────────
+// In-memory runtime cache for analysed pairs (keyed by "clientId_candidateId")
+// Cache is skipped when full customer objects are supplied (fresh data mode).
+// ─────────────────────────────────────────────────────────────────────────────
 const analysisCache = new Map<string, {
   summary: string;
   potentialAnalysis: string;
@@ -11,9 +14,25 @@ const analysisCache = new Map<string, {
   score: number;
 }>();
 
+// Model to use — override via OPENAI_MODEL env variable
+const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Map OpenAI HTTP status codes to user-friendly messages
+// ─────────────────────────────────────────────────────────────────────────────
+function openAiErrorMessage(status: number): string {
+  switch (status) {
+    case 401: return 'Invalid OpenAI API key. Please check your OPENAI_API_KEY environment variable.';
+    case 429: return 'OpenAI rate limit reached. Please wait a moment and try again.';
+    case 500:
+    case 502:
+    case 503: return 'OpenAI service is temporarily unavailable. Please try again shortly.';
+    default:  return `OpenAI API returned an unexpected error (HTTP ${status}).`;
+  }
+}
+
 export async function POST(request: Request) {
   try {
-    // Accept optional full customer data from the client (for localStorage-based customers)
     const body = await request.json();
     const { clientId, candidateId, clientData, candidateData } = body;
 
@@ -24,14 +43,16 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check memory cache (skip cache if full data was provided to ensure freshness)
+    // ── Cache check ──────────────────────────────────────────────────────────
+    // Skip cache when full profile objects are provided (ensure freshness).
     const cacheKey = `${clientId}_${candidateId}`;
     if (!clientData && !candidateData && analysisCache.has(cacheKey)) {
       return NextResponse.json({ ...analysisCache.get(cacheKey), cached: true });
     }
 
-    // Use provided customer data if available (for newly created customers in localStorage)
-    // Fall back to mockCustomers for seed data
+    // ── Resolve customer profiles ────────────────────────────────────────────
+    // Use provided data first (for customers created in-session), then fall
+    // back to the seeded mockCustomers dataset.
     const client: Customer | undefined = clientData || mockCustomers.find(c => c.id === clientId);
     const candidate: Customer | undefined = candidateData || mockCustomers.find(c => c.id === candidateId);
 
@@ -42,46 +63,20 @@ export async function POST(request: Request) {
       );
     }
 
-    // Compute basic compatibility score
+    // ── Algorithmic compatibility score ──────────────────────────────────────
     const matchingResult = calculateCompatibility(client, candidate);
 
-    // Check for OpenAI API key
+    // ── API key guard ────────────────────────────────────────────────────────
     const apiKey = process.env.OPENAI_API_KEY;
-
-    if (!apiKey) {
-      // Graceful fallback with highly realistic generated data
-      const mockResult = generateMockAIAnalysis(client, candidate, matchingResult.score);
-      if (!clientData && !candidateData) {
-        analysisCache.set(cacheKey, mockResult);
-      }
-      return NextResponse.json({ ...mockResult, cached: false, note: 'Mock Fallback: OpenAI key not set' });
+    if (!apiKey || apiKey.startsWith('sk-...')) {
+      return NextResponse.json(
+        { error: 'OpenAI API key is not configured. Please add your OPENAI_API_KEY to .env.local and restart the server.' },
+        { status: 503 }
+      );
     }
 
-    // Call OpenAI API
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        response_format: { type: 'json_object' },
-        messages: [
-          {
-            role: 'system',
-            content: `You are an expert relationship psychologist and professional matchmaker at 'The Date Crew'. 
-Analyze the two client profiles provided and evaluate their compatibility.
-You must return a JSON object containing precisely three string fields:
-1. "summary": A warm, professional 2-3 sentence overview of why they match.
-2. "potentialAnalysis": An insightful paragraph evaluating their long-term potential, including shared values and lifestyle alignments.
-3. "introduction": A personalized, warm email introduction letter (written from the matchmaker to both of them) introducing them to each other, highlighting common hobbies/interests, and suggesting a first date.
-
-Return ONLY valid JSON.`,
-          },
-          {
-            role: 'user',
-            content: `Evaluate compatibility for the following pair:
+    // ── Build the OpenAI request ─────────────────────────────────────────────
+    const prompt = `Evaluate compatibility for the following pair:
 
 === CLIENT A ===
 Name: ${client.firstName} ${client.lastName}
@@ -90,13 +85,14 @@ Age: ${client.age}
 Location: ${client.city}, ${client.country}
 Occupation: ${client.occupation} (${client.designation} at ${client.company})
 Education: ${client.degree} (${client.college})
-Religion: ${client.religion}
+Religion: ${client.religion || 'Not specified'}
 Income: ${client.income}
 Mother Tongue: ${client.motherTongue}
 Hobbies: ${client.hobbies.join(', ')}
 Interests: ${client.interests.join(', ')}
 Bio: ${client.bio}
 Family Planning (Kids): ${client.wantKids}
+Lifestyle: Diet — ${client.diet}, Smoking — ${client.smoking}, Drinking — ${client.drinking}
 
 === CLIENT B ===
 Name: ${candidate.firstName} ${candidate.lastName}
@@ -105,74 +101,120 @@ Age: ${candidate.age}
 Location: ${candidate.city}, ${candidate.country}
 Occupation: ${candidate.occupation} (${candidate.designation} at ${candidate.company})
 Education: ${candidate.degree} (${candidate.college})
-Religion: ${candidate.religion}
+Religion: ${candidate.religion || 'Not specified'}
 Income: ${candidate.income}
 Mother Tongue: ${candidate.motherTongue}
 Hobbies: ${candidate.hobbies.join(', ')}
 Interests: ${candidate.interests.join(', ')}
 Bio: ${candidate.bio}
 Family Planning (Kids): ${candidate.wantKids}
+Lifestyle: Diet — ${candidate.diet}, Smoking — ${candidate.smoking}, Drinking — ${candidate.drinking}
 
-Matching Score calculated by algorithm: ${matchingResult.score}/100.
-Provide professional analysis matching this score.`,
-          },
-        ],
-      }),
-    });
+Algorithmic Compatibility Score: ${matchingResult.score}/100.
+Provide professional analysis that is consistent with this score.`;
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('OpenAI API request failed:', errorText);
-      // Fallback on API failure
-      const mockResult = generateMockAIAnalysis(client, candidate, matchingResult.score);
-      if (!clientData && !candidateData) {
-        analysisCache.set(cacheKey, mockResult);
+    // 30-second timeout to avoid hanging Next.js requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30_000);
+
+    let openAiResponse: Response;
+    try {
+      openAiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: OPENAI_MODEL,
+          response_format: { type: 'json_object' },
+          messages: [
+            {
+              role: 'system',
+              content: `You are an expert relationship psychologist and professional matchmaker at 'The Date Crew'.
+Analyse the two client profiles provided and evaluate their compatibility.
+Return a JSON object with exactly three string fields:
+1. "summary": A warm, professional 2–3 sentence overview of why they are or are not a good match.
+2. "potentialAnalysis": An insightful paragraph evaluating long-term potential, shared values, and lifestyle alignment.
+3. "introduction": A personalised, warm email introduction letter written from the matchmaker to both clients, highlighting their common ground and suggesting a first date idea.
+
+Return ONLY valid JSON — no markdown, no code fences.`,
+            },
+            {
+              role: 'user',
+              content: prompt,
+            },
+          ],
+        }),
+      });
+    } catch (fetchError: any) {
+      clearTimeout(timeoutId);
+      if (fetchError?.name === 'AbortError') {
+        return NextResponse.json(
+          { error: 'Request to OpenAI timed out after 30 seconds. Please try again.' },
+          { status: 504 }
+        );
       }
-      return NextResponse.json({ ...mockResult, cached: false, note: 'Mock Fallback: API call failed' });
+      return NextResponse.json(
+        { error: 'Could not reach OpenAI API. Please check your internet connection.' },
+        { status: 502 }
+      );
+    } finally {
+      clearTimeout(timeoutId);
     }
 
-    const responseData = await response.json();
-    const gptContent = JSON.parse(responseData.choices[0].message.content);
+    // ── Handle non-2xx from OpenAI ───────────────────────────────────────────
+    if (!openAiResponse.ok) {
+      const errorBody = await openAiResponse.text().catch(() => '');
+      console.error(`[generate-match-analysis] OpenAI error ${openAiResponse.status}:`, errorBody);
+      return NextResponse.json(
+        { error: openAiErrorMessage(openAiResponse.status) },
+        { status: openAiResponse.status }
+      );
+    }
+
+    // ── Parse the response ───────────────────────────────────────────────────
+    let gptContent: { summary?: string; potentialAnalysis?: string; introduction?: string };
+    try {
+      const responseData = await openAiResponse.json();
+      gptContent = JSON.parse(responseData.choices[0].message.content);
+    } catch (parseError) {
+      console.error('[generate-match-analysis] Failed to parse OpenAI JSON response:', parseError);
+      return NextResponse.json(
+        { error: 'OpenAI returned an unexpected response format. Please try again.' },
+        { status: 500 }
+      );
+    }
+
+    // Validate expected fields are present
+    if (!gptContent.summary || !gptContent.potentialAnalysis || !gptContent.introduction) {
+      console.error('[generate-match-analysis] OpenAI response missing required fields:', gptContent);
+      return NextResponse.json(
+        { error: 'OpenAI response was incomplete. Please try again.' },
+        { status: 500 }
+      );
+    }
 
     const result = {
-      summary: gptContent.summary || '',
-      potentialAnalysis: gptContent.potentialAnalysis || '',
-      introduction: gptContent.introduction || '',
-      score: matchingResult.score
+      summary: gptContent.summary,
+      potentialAnalysis: gptContent.potentialAnalysis,
+      introduction: gptContent.introduction,
+      score: matchingResult.score,
     };
 
-    // Cache the response
+    // Cache successful results (only when using seeded data, not live-supplied profiles)
     if (!clientData && !candidateData) {
       analysisCache.set(cacheKey, result);
     }
 
     return NextResponse.json({ ...result, cached: false });
+
   } catch (error) {
-    console.error('generate-match-analysis error:', error);
+    console.error('[generate-match-analysis] Unhandled error:', error);
     return NextResponse.json(
-      { error: 'An unexpected internal error occurred during generation' },
+      { error: 'An unexpected internal error occurred. Please try again.' },
       { status: 500 }
     );
   }
-}
-
-// Fallback generator for generating rich, contextual analyses without OpenAI keys
-function generateMockAIAnalysis(client: Customer, candidate: Customer, score: number) {
-  const commonHobbies = client.hobbies.filter(h => candidate.hobbies.includes(h));
-  const overlapText = commonHobbies.length > 0
-    ? `shared interests in ${commonHobbies.slice(0, 2).join(' and ')}`
-    : `a shared dedication to their respective professions in ${client.city}`;
-
-  const summary = `${client.firstName} and ${candidate.firstName} display a strong compatibility score of ${score}%, highlighted by their ${overlapText}, complementary lifestyles, and aligned long-term relationship expectations.`;
-
-  const potentialAnalysis = `This pairing has significant long-term potential. Both individuals express a similar outlook regarding family planning ("${client.wantKids}") and show matching thresholds for relocation flexibility. ${client.firstName}'s career as a ${client.occupation || 'professional'} blends well with ${candidate.firstName}'s role as a ${candidate.occupation || 'professional'}. Their communication styles appear compatible, showing high potential for building a balanced, supportive partnership.`;
-
-  const introduction = `Hi ${client.firstName} & ${candidate.firstName},\n\nI am thrilled to introduce you to each other! \n\n${client.firstName}, meet ${candidate.firstName}—who is a ${candidate.occupation} in ${candidate.city}. ${candidate.firstName}, meet ${client.firstName}—who is a ${client.occupation} in ${client.city}.\n\nI was immediately drawn to your profiles because you both share a deep love for ${client.hobbies[0] || 'exploring new activities'} and have a lot in common in terms of your values, life goals, and career drives. \n\nI think you two would have a wonderful time connecting. I'd highly recommend meeting up for a warm cup of coffee or a casual weekend walk in the city to get to know each other!\n\nWarmly,\nYour Date Crew Matchmaker`;
-
-  return {
-    summary,
-    potentialAnalysis,
-    introduction,
-    score
-  };
 }

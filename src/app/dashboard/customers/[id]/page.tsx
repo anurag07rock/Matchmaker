@@ -227,14 +227,18 @@ export default function CustomerDetailPage({ params }: PageProps) {
         })
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('OpenAI request failed. Falling back...');
+        // Surface the structured error message returned by the API
+        setAnalysisError(data.error || `AI service returned an error (HTTP ${response.status}). Please try again.`);
+        return;
       }
 
-      const data = await response.json();
       setAnalysisResult(data);
     } catch (err) {
-      setAnalysisError(err instanceof Error ? err.message : String(err));
+      // Network-level failure (no response at all)
+      setAnalysisError('Could not reach the AI service. Please check your connection and try again.');
     } finally {
       setAnalysisLoading(false);
     }

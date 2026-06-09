@@ -4,6 +4,22 @@ A production-ready CRM and matchmaking dashboard designed for professional match
 
 ---
 
+## 📝 Submission Write-up
+
+### Tech Choices & Architecture
+This application is built using a modern, scalable full-stack architecture consisting of a **Next.js 16 (React 19) App Router** frontend and an **Express.js + TypeScript** backend. The frontend utilizes Tailwind CSS to deliver a premium, responsive glassmorphism user interface designed specifically for internal CRM operations. For storage, we implement a flexible database layer utilizing PostgreSQL (via the native `pg` client) that seamlessly falls back to a local SQLite database for frictionless local development. Authentication is secured using JSON Web Tokens (JWT) and `bcryptjs` password hashing, supporting both traditional email/password credentials and a simulated OTP-based phone login flow.
+
+### Matching Logic & AI Engine
+The core matchmaking engine implements a bi-directional compatibility algorithm. It first checks strict hard filters (gender preferences and dealbreakers) to eliminate incompatible pairings. For candidates passing these checks, a scoring matrix assigns points out of 100 based on gender-specific preferences: male clients score candidates on age difference, relative height, relative income, and family planning; female clients score candidates on professional compatibility, value alignment (religion), education tiers, relocation willingness, family outlook, languages, and lifestyle attributes. Beyond quantitative scoring, we integrated OpenAI’s `gpt-4o-mini` API to automatically generate a detailed match briefing on-demand, returning structured JSON that provides compatibility summaries, long-term potential analysis, and a pre-drafted introduction email.
+
+### Assumptions Made
+Several key assumptions were made to simplify the MVP design:
+* **Admin-Only Access**: Matchmakers are the sole operators of the platform; hence, client registration is omitted, and all profiles are managed internally.
+* **OTP Testing Environment**: To avoid setup complexity for evaluators, the SMS OTP verification leverages a mock testing path where entering phone `666666` and OTP `777777` authenticates directly into the seeded `maggie@thedatecrew.com` account.
+* **OpenAI Cost Guardrails**: To avoid API token overhead, generated briefings are cached in-memory. If no API key is configured or the service is unreachable, the system fails gracefully with a user-friendly diagnostic alert rather than resorting to silent placeholder fallbacks.
+
+---
+
 ## 🚀 Architecture & Tech Stack
 
 ### Frontend
@@ -83,8 +99,13 @@ Visit `http://localhost:3000` in your browser.
 
 Use the following seeded credentials to access the matchmaking dashboard:
 
+### Option 1: Login with Email
 - **Email**: `maggie@thedatecrew.com`
 - **Password**: `password123`
+
+### Option 2: Login with Phone Number (OTP Test)
+- **Phone Number**: `666666`
+- **Verification OTP**: `777777`
 
 ---
 
@@ -152,7 +173,7 @@ The AI generates:
 2. **Potential Analysis**: Deep dive into long-term potential, values, and lifestyle alignment.
 3. **Introduction**: A personalized email draft from the matchmaker introducing the pair.
 
-*Note: The platform includes a seamless fallback generator. If the OpenAI API key is missing or the request fails, the system immediately generates a realistic mock brief without crashing.*
+*Note: If the OpenAI API key is missing or the request fails, the system immediately bubbles up a structured, user-friendly error response (e.g. key missing, rate limits, timeouts) to prevent silent failures.*
 
 ---
 
