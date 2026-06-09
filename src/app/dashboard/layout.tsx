@@ -12,7 +12,7 @@ interface MatchmakerAccount {
   password: string;
   name: string;
   title: string;
-  theme: 'rose' | 'midnight' | 'emerald' | 'dark';
+  theme: 'light' | 'dark';
 }
 
 const PRESET_ACCOUNTS: MatchmakerAccount[] = [
@@ -22,7 +22,7 @@ const PRESET_ACCOUNTS: MatchmakerAccount[] = [
     password: 'password123',
     name: 'Maggie Crew',
     title: 'Senior Matchmaker',
-    theme: 'rose'
+    theme: 'light'
   },
   {
     email: 'william@thedatecrew.com',
@@ -30,7 +30,7 @@ const PRESET_ACCOUNTS: MatchmakerAccount[] = [
     password: 'password456',
     name: 'William Sterling',
     title: 'Lead Matchmaker',
-    theme: 'midnight'
+    theme: 'dark'
   },
   {
     email: 'chloe@thedatecrew.com',
@@ -38,7 +38,7 @@ const PRESET_ACCOUNTS: MatchmakerAccount[] = [
     password: 'password789',
     name: 'Chloe Valance',
     title: 'Associate Matchmaker',
-    theme: 'emerald'
+    theme: 'light'
   },
   {
     email: 'alex@thedatecrew.com',
@@ -69,11 +69,11 @@ export default function DashboardLayout({
   const [showRegister, setShowRegister] = useState(false);
   const [newName, setNewName] = useState('');
   const [newTitle, setNewTitle] = useState('');
-  const [newTheme, setNewTheme] = useState<'rose' | 'midnight' | 'emerald' | 'dark'>('dark');
+  const [newTheme, setNewTheme] = useState<'light' | 'dark'>('light');
   
   const [showPresetPanel, setShowPresetPanel] = useState(true);
   const [customAccounts, setCustomAccounts] = useState<MatchmakerAccount[]>([]);
-  const [activeTheme, setActiveTheme] = useState<'rose' | 'midnight' | 'emerald' | 'dark'>('rose');
+  const [activeTheme, setActiveTheme] = useState<'light' | 'dark'>('light');
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [hasMoved, setHasMoved] = useState(false);
 
@@ -118,29 +118,17 @@ export default function DashboardLayout({
 
   const getOrbClasses = () => {
     switch (activeTheme) {
-      case 'rose':
+      case 'light':
         return {
-          orb1: 'bg-rose-500/8',
-          orb2: 'bg-amber-500/4',
-          orb3: 'bg-violet-600/4'
-        };
-      case 'midnight':
-        return {
-          orb1: 'bg-indigo-600/8',
-          orb2: 'bg-violet-650/6',
-          orb3: 'bg-sky-500/4'
-        };
-      case 'emerald':
-        return {
-          orb1: 'bg-emerald-600/8',
-          orb2: 'bg-teal-500/6',
-          orb3: 'bg-lime-500/4'
+          orb1: 'opacity-0',
+          orb2: 'opacity-0',
+          orb3: 'opacity-0'
         };
       default: // dark / fallback
         return {
-          orb1: 'bg-zinc-700/8',
-          orb2: 'bg-zinc-800/8',
-          orb3: 'bg-violet-600/4'
+          orb1: 'bg-rose-950/10',
+          orb2: 'bg-pink-950/6',
+          orb3: 'bg-rose-950/4'
         };
     }
   };
@@ -149,14 +137,10 @@ export default function DashboardLayout({
 
   const getSpotlightColor = () => {
     switch (activeTheme) {
-      case 'rose':
-        return 'rgba(244, 63, 94, 0.07)';
-      case 'midnight':
-        return 'rgba(79, 70, 229, 0.07)';
-      case 'emerald':
-        return 'rgba(16, 185, 129, 0.07)';
+      case 'light':
+        return 'transparent';
       default:
-        return 'rgba(161, 161, 170, 0.07)';
+        return 'rgba(224, 82, 117, 0.06)';
     }
   };
 
@@ -288,7 +272,7 @@ export default function DashboardLayout({
 
   return (
     <AppContextProvider>
-      <div className="relative flex h-screen w-screen overflow-hidden bg-zinc-950">
+      <div className={`relative flex h-screen w-screen overflow-hidden bg-[var(--background)] theme-${activeTheme}`}>
         
         {/* Main Dashboard Layout (Blurred if not logged in) */}
         <div className={`flex flex-1 min-w-0 overflow-hidden transition-all duration-500 ${!hasSession ? 'blur-md pointer-events-none select-none' : ''}`}>
@@ -301,7 +285,7 @@ export default function DashboardLayout({
             <Navbar onMenuClick={() => setSidebarOpen(true)} />
 
             {/* Dynamic Content View */}
-            <main className="flex-1 overflow-y-auto bg-zinc-950 p-4 sm:p-6 lg:p-8 relative overflow-hidden">
+            <main className="flex-1 overflow-y-auto bg-[var(--background)] p-4 sm:p-6 lg:p-8 relative overflow-hidden">
               {/* Dynamic Interactive Background System */}
               <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 select-none">
                 {/* Subtle Tech Grid Pattern */}
@@ -337,9 +321,9 @@ export default function DashboardLayout({
               <div className="text-center flex flex-col items-center">
                 <div className="relative flex items-center justify-center w-14 h-14 rounded-2xl bg-zinc-900/80 border border-zinc-800 shadow-xl mb-4 group hover:border-rose-500/50 transition-all duration-300">
                   <Heart className="w-6 h-6 text-rose-500 group-hover:scale-110 transition-transform duration-300 fill-rose-500/20" />
-                  <Sparkles className="w-3.5 h-3.5 text-violet-400 absolute top-2 right-2 animate-pulse" />
+                  <Sparkles className="w-3.5 h-3.5 text-rose-400 absolute top-2 right-2 animate-pulse" />
                 </div>
-                <h1 className="text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-zinc-50 via-rose-300 to-violet-400">
+                <h1 className="text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-zinc-50 via-rose-300 to-pink-400">
                   The Date Crew
                 </h1>
                 <p className="text-sm text-zinc-400 mt-2 font-medium">
@@ -411,7 +395,7 @@ export default function DashboardLayout({
                       <button
                         type="submit"
                         disabled={isLoading}
-                        className="relative w-full py-3 bg-gradient-to-r from-rose-500 to-violet-600 text-white rounded-xl text-sm font-semibold hover:from-rose-600 hover:to-violet-700 focus:outline-none focus:ring-2 focus:ring-rose-500/50 active:scale-[0.98] transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden shadow-lg shadow-rose-950/20 group"
+                        className="relative w-full py-3 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-xl text-sm font-semibold hover:from-rose-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-rose-500/50 active:scale-[0.98] transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden shadow-lg shadow-rose-950/20 group"
                       >
                         {isLoading ? (
                           <span className="flex items-center justify-center gap-2">
@@ -485,25 +469,19 @@ export default function DashboardLayout({
                       <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
                         Dashboard Theme Color
                       </label>
-                      <div className="grid grid-cols-4 gap-2">
-                        {(['dark', 'rose', 'midnight', 'emerald'] as const).map((t) => (
+                      <div className="grid grid-cols-2 gap-2">
+                        {(['light', 'dark'] as const).map((t) => (
                           <button
                             key={t}
                             type="button"
                             onClick={() => setNewTheme(t)}
                             className={`py-2 text-xs font-semibold rounded-xl border transition-all capitalize select-none ${
                               newTheme === t
-                                ? t === 'rose'
-                                  ? 'bg-rose-950/30 border-rose-500 text-rose-400'
-                                  : t === 'midnight'
-                                  ? 'bg-indigo-950/30 border-indigo-500 text-indigo-400'
-                                  : t === 'emerald'
-                                  ? 'bg-emerald-950/30 border-emerald-500 text-emerald-400'
-                                  : 'bg-zinc-900 border-zinc-400 text-zinc-100'
+                                ? 'bg-rose-500/10 border-rose-500 text-rose-400'
                                 : 'bg-zinc-900/40 border-zinc-850 text-zinc-500 hover:text-zinc-300 hover:border-zinc-700'
                             }`}
                           >
-                            {t}
+                            {t === 'light' ? 'Light Mode' : 'Dark Mode'}
                           </button>
                         ))}
                       </div>
@@ -520,7 +498,7 @@ export default function DashboardLayout({
                       <button
                         type="submit"
                         disabled={isLoading}
-                        className="flex-1 py-2.5 bg-gradient-to-r from-rose-500 to-violet-600 hover:from-rose-600 hover:to-violet-700 text-white rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-1.5"
+                        className="flex-1 py-2.5 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-1.5"
                       >
                         {isLoading ? (
                           <>

@@ -608,23 +608,23 @@ export default function CustomersPage() {
                         </div>
                       </td>
                       <td className="py-4 px-6">
-                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold border capitalize ${
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border capitalize ${
                           client.status === 'active' 
-                            ? 'bg-emerald-950/30 border-emerald-500/20 text-emerald-400'
+                            ? 'bg-emerald-100 border-emerald-300 text-emerald-700'
                             : client.status === 'paused'
-                            ? 'bg-amber-950/30 border-amber-500/20 text-amber-400'
+                            ? 'bg-amber-100 border-amber-300 text-amber-700'
                             : client.status === 'matched'
-                            ? 'bg-rose-950/30 border-rose-500/20 text-rose-400'
-                            : 'bg-zinc-900 border-zinc-800 text-zinc-400'
+                            ? 'bg-rose-100 border-rose-300 text-rose-700'
+                            : 'bg-zinc-100 border-zinc-300 text-zinc-600'
                         }`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${
                             client.status === 'active' 
-                              ? 'bg-emerald-400'
+                              ? 'bg-emerald-500'
                               : client.status === 'paused'
-                              ? 'bg-amber-400'
+                              ? 'bg-amber-500'
                               : client.status === 'matched'
-                              ? 'bg-rose-400'
-                              : 'bg-zinc-500'
+                              ? 'bg-rose-500'
+                              : 'bg-zinc-400'
                           }`} />
                           {client.status}
                         </span>
@@ -681,14 +681,14 @@ export default function CustomersPage() {
                         <p className="font-semibold text-zinc-200">
                           {client.firstName} {client.lastName}
                         </p>
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border capitalize ${
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border capitalize ${
                           client.status === 'active' 
-                            ? 'bg-emerald-950/30 border-emerald-500/20 text-emerald-400'
+                            ? 'bg-emerald-100 border-emerald-300 text-emerald-700'
                             : client.status === 'paused'
-                            ? 'bg-amber-950/30 border-amber-500/20 text-amber-400'
+                            ? 'bg-amber-100 border-amber-300 text-amber-700'
                             : client.status === 'matched'
-                            ? 'bg-rose-950/30 border-rose-500/20 text-rose-400'
-                            : 'bg-zinc-900 border-zinc-800 text-zinc-400'
+                            ? 'bg-rose-100 border-rose-300 text-rose-700'
+                            : 'bg-zinc-100 border-zinc-300 text-zinc-600'
                         }`}>
                           {client.status}
                         </span>
@@ -1121,7 +1121,7 @@ export default function CustomersPage() {
                   <button
                     type="button"
                     onClick={handleOnboardSubmit}
-                    className="px-5 py-2 bg-gradient-to-r from-rose-500 to-violet-600 hover:from-rose-600 hover:to-violet-700 text-white rounded-xl text-xs font-bold shadow-md active:scale-[0.98] transition-colors flex items-center gap-1.5 cursor-pointer"
+                    className="px-5 py-2 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white rounded-xl text-xs font-bold shadow-md active:scale-[0.98] transition-colors flex items-center gap-1.5 cursor-pointer"
                   >
                     <Save className="w-3.5 h-3.5" />
                     Onboard Client

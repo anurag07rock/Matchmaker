@@ -414,25 +414,25 @@ Senior Matchmaker, The Date Crew`;
         {/* Horizontal Steps Layout */}
         <div className="grid grid-cols-4 gap-4 text-center pt-2 select-none">
           <div className="flex flex-col items-center space-y-1">
-            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border transition-colors ${journey.step >= 1 ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400' : 'border-zinc-800 text-zinc-600'}`}>
+            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border transition-colors ${journey.step >= 1 ? 'bg-rose-500/10 border-rose-500 text-rose-400' : 'border-zinc-800 text-zinc-600'}`}>
               {journey.step >= 1 ? '✓' : '1'}
             </span>
             <span className="text-[10px] font-semibold text-zinc-400">Onboarded</span>
           </div>
           <div className="flex flex-col items-center space-y-1">
-            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border transition-colors ${journey.step >= 1 ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400' : 'border-zinc-800 text-zinc-600'}`}>
+            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border transition-colors ${journey.step >= 1 ? 'bg-rose-500/10 border-rose-500 text-rose-400' : 'border-zinc-800 text-zinc-600'}`}>
               {journey.step >= 1 ? '✓' : '2'}
             </span>
             <span className="text-[10px] font-semibold text-zinc-400">Seeking Matches</span>
           </div>
           <div className="flex flex-col items-center space-y-1">
-            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border transition-colors ${journey.step >= 2 ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400' : 'border-zinc-800 text-zinc-600'}`}>
+            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border transition-colors ${journey.step >= 2 ? 'bg-rose-500/10 border-rose-500 text-rose-400' : 'border-zinc-800 text-zinc-600'}`}>
               {journey.step >= 2 ? '✓' : '3'}
             </span>
             <span className="text-[10px] font-semibold text-zinc-400">Proposals Sent</span>
           </div>
           <div className="flex flex-col items-center space-y-1">
-            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border transition-colors ${journey.step >= 4 ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400' : 'border-zinc-800 text-zinc-600'}`}>
+            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border transition-colors ${journey.step >= 4 ? 'bg-rose-500/10 border-rose-500 text-rose-400' : 'border-zinc-800 text-zinc-600'}`}>
               {journey.step >= 4 ? '✓' : '4'}
             </span>
             <span className="text-[10px] font-semibold text-zinc-400">Matched</span>
@@ -456,7 +456,7 @@ Senior Matchmaker, The Date Crew`;
           <InfoSection 
             title="Professional & Academic Details" 
             icon={Briefcase} 
-            iconColor="text-violet-400" 
+            iconColor="text-pink-400" 
             items={careerItems} 
           />
 
@@ -465,14 +465,14 @@ Senior Matchmaker, The Date Crew`;
             <InfoSection 
               title="Family Details" 
               icon={Users} 
-              iconColor="text-indigo-400" 
+              iconColor="text-rose-400" 
               items={familyItems} 
             />
 
             <InfoSection 
               title="Lifestyle & Habits" 
               icon={Smile} 
-              iconColor="text-amber-400" 
+              iconColor="text-rose-400"
               items={lifestyleItems} 
             />
           </div>
@@ -530,7 +530,7 @@ Senior Matchmaker, The Date Crew`;
                       <span className="px-1.5 py-0.5 rounded bg-rose-500/10 border border-rose-500/20 text-[9px] font-bold text-rose-400">
                         {item.score}% Fit
                       </span>
-                      <span className={`text-[8px] font-bold tracking-wider uppercase ${item.status === 'responded' ? 'text-emerald-400' : item.status === 'sent' ? 'text-blue-400' : 'text-zinc-500'}`}>
+                      <span className={`text-[8px] font-bold tracking-wider uppercase ${item.status === 'responded' ? 'text-rose-400' : item.status === 'sent' ? 'text-pink-400' : 'text-zinc-500'}`}>
                         {item.status}
                       </span>
                     </div>
@@ -610,10 +610,10 @@ Senior Matchmaker, The Date Crew`;
               const isHigh = compatibility.score >= 80;
               const isMedium = compatibility.score >= 60 && compatibility.score < 80;
               const scoreBadgeColor = isHigh
-                ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
+                ? 'text-rose-400 bg-rose-500/10 border-rose-500/20'
                 : isMedium
-                ? 'text-amber-400 bg-amber-500/10 border-amber-500/20'
-                : 'text-rose-400 bg-rose-500/10 border-rose-500/20';
+                ? 'text-pink-400 bg-pink-500/10 border-pink-500/20'
+                : 'text-pink-300 bg-pink-500/[0.07] border-pink-500/15';
 
               return (
                 <div
@@ -667,11 +667,11 @@ Senior Matchmaker, The Date Crew`;
                     <div className="space-y-2.5 pt-1 border-t border-zinc-900">
                       {compatibility.pros.length > 0 && (
                         <div className="space-y-1">
-                          <span className="text-[9px] uppercase tracking-wider font-bold text-emerald-400">Match Strengths:</span>
+                          <span className="text-[9px] uppercase tracking-wider font-bold text-rose-400">Match Strengths:</span>
                           <ul className="text-xs text-zinc-400 space-y-1 pl-1">
                             {compatibility.pros.slice(0, 2).map((pro, pIdx) => (
                               <li key={pIdx} className="flex items-start gap-1.5">
-                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500/80 shrink-0 mt-0.5" />
+                                <CheckCircle2 className="w-3.5 h-3.5 text-rose-500/80 shrink-0 mt-0.5" />
                                 <span className="leading-tight">{pro}</span>
                               </li>
                             ))}
@@ -681,11 +681,11 @@ Senior Matchmaker, The Date Crew`;
 
                       {compatibility.cons.length > 0 && (
                         <div className="space-y-1">
-                          <span className="text-[9px] uppercase tracking-wider font-bold text-amber-500">Potential Friction:</span>
+                          <span className="text-[9px] uppercase tracking-wider font-bold text-pink-500">Potential Friction:</span>
                           <ul className="text-xs text-zinc-400 space-y-1 pl-1">
                             {compatibility.cons.slice(0, 1).map((con, cIdx) => (
                               <li key={cIdx} className="flex items-start gap-1.5">
-                                <XCircle className="w-3.5 h-3.5 text-amber-500/70 shrink-0 mt-0.5" />
+                                <XCircle className="w-3.5 h-3.5 text-pink-500/70 shrink-0 mt-0.5" />
                                 <span className="leading-tight text-zinc-400/90">{con}</span>
                               </li>
                             ))}
@@ -766,7 +766,7 @@ Senior Matchmaker, The Date Crew`;
                 </div>
 
                 <div className="flex flex-col items-center">
-                  <div className="h-px w-20 bg-gradient-to-r from-rose-500/30 to-violet-500/30 relative flex items-center justify-center">
+                  <div className="h-px w-20 bg-gradient-to-r from-rose-500/30 to-pink-500/30 relative flex items-center justify-center">
                     <HeartHandshake className="w-4 h-4 text-rose-500 absolute -top-2 animate-pulse" />
                   </div>
                   <span className="text-[10px] text-zinc-500 font-bold mt-2 font-mono">
@@ -829,7 +829,7 @@ Senior Matchmaker, The Date Crew`;
                   </div>
 
                   <div className="space-y-2">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-violet-400 flex items-center gap-1.5">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
                       <Brain className="w-3.5 h-3.5" />
                       Relationship Potential Analysis
                     </h4>
@@ -840,7 +840,7 @@ Senior Matchmaker, The Date Crew`;
 
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-pink-400 flex items-center gap-1.5">
                         <Mail className="w-3.5 h-3.5" />
                         Personalized Introduction Pitch
                       </h4>
@@ -849,7 +849,7 @@ Senior Matchmaker, The Date Crew`;
                         onClick={() => handleCopyIntroduction(analysisResult.introduction)}
                         className={`flex items-center gap-1 text-[10px] font-semibold transition-colors px-2 py-1 rounded-lg border cursor-pointer ${
                           copied 
-                            ? 'text-emerald-400 bg-emerald-950/20 border-emerald-500/20' 
+                            ? 'text-rose-400 bg-rose-500/10 border-rose-500/20' 
                             : 'text-zinc-400 hover:text-zinc-200 bg-zinc-900/50 border-zinc-800'
                         }`}
                       >

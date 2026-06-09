@@ -58,7 +58,7 @@ export default function NotesPanel({ notes = [], onAddNote, onEditNote, onDelete
     <div className="glass-panel rounded-2xl p-6 border-zinc-800/60 shadow-sm flex flex-col justify-between space-y-5 h-full">
       <div>
         <div className="flex items-center gap-2 font-bold text-sm text-zinc-200 border-b border-zinc-900 pb-3 mb-4">
-          <StickyNote className="w-4.5 h-4.5 text-violet-400" />
+          <StickyNote className="w-4.5 h-4.5 text-rose-400" />
           Internal Matchmaker Notes
         </div>
 
@@ -71,7 +71,7 @@ export default function NotesPanel({ notes = [], onAddNote, onEditNote, onDelete
                 className="p-3.5 bg-zinc-900/40 border border-zinc-800 rounded-xl space-y-1.5 animate-fadeIn group/note"
               >
                 <div className="flex items-center justify-between text-[9px] text-zinc-500 font-semibold">
-                  <span className="text-violet-400">{note.author || 'Senior Matchmaker'}</span>
+                  <span className="text-rose-400">{note.author || 'Senior Matchmaker'}</span>
                   <div className="flex items-center gap-2.5">
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
@@ -122,7 +122,7 @@ export default function NotesPanel({ notes = [], onAddNote, onEditNote, onDelete
                       </button>
                       <button
                         onClick={() => handleSaveEdit(note.id)}
-                        className="p-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] flex items-center gap-0.5"
+                        className="p-1 rounded bg-rose-600 hover:bg-rose-700 text-white text-[10px] flex items-center gap-0.5"
                       >
                         <Check className="w-3.5 h-3.5" />
                         Save
@@ -163,7 +163,7 @@ export default function NotesPanel({ notes = [], onAddNote, onEditNote, onDelete
           <button
             type="submit"
             disabled={isAdding || !newNote.trim()}
-            className="flex items-center justify-center gap-1.5 px-4 py-2 bg-gradient-to-r from-rose-500 to-violet-600 hover:from-rose-600 hover:to-violet-700 text-white rounded-xl text-xs font-bold shadow-md transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="flex items-center justify-center gap-1.5 px-4 py-2 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white rounded-xl text-xs font-bold shadow-md transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isAdding ? (
               <>

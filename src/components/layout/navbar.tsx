@@ -23,7 +23,9 @@ import {
   Camera,
   Image as ImageIcon,
   Upload,
-  User
+  User,
+  Moon,
+  Sun
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 
@@ -56,7 +58,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
   const [profileTitle, setProfileTitle] = useState('');
   const [profileEmail, setProfileEmail] = useState('');
   const [profilePhone, setProfilePhone] = useState('');
-  const [profileTheme, setProfileTheme] = useState<'rose' | 'midnight' | 'emerald' | 'dark'>('dark');
+  const [profileTheme, setProfileTheme] = useState<'light' | 'dark'>('light');
   const [profileAvatarUrl, setProfileAvatarUrl] = useState('');
 
   // Profile Edit Avatar States
@@ -297,15 +299,9 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
       .toUpperCase()
       .slice(0, 2);
   };
-
-  // Dynamic profile background gradients based on settings theme
   const getAvatarBg = () => {
-    if (settings.theme === 'rose') return 'from-rose-500 to-amber-500';
-    if (settings.theme === 'midnight') return 'from-indigo-500 to-violet-600';
-    if (settings.theme === 'emerald') return 'from-emerald-500 to-teal-600';
-    return 'from-rose-500 to-violet-600';
+    return 'from-rose-500 to-rose-400';
   };
-
   const getRelativeTime = (timestamp: string) => {
     const now = new Date();
     const date = new Date(timestamp);
@@ -323,23 +319,31 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'customer_added':
-        return <UserPlus className="w-4 h-4 text-emerald-400" />;
+        return <UserPlus className="w-4 h-4 text-rose-400" />;
       case 'match_suggested':
         return <Heart className="w-4 h-4 text-rose-400" fill="currentColor" fillOpacity={0.2} />;
       case 'match_sent':
-        return <Mail className="w-4 h-4 text-sky-400" />;
+        return <Mail className="w-4 h-4 text-rose-400" />;
       case 'note_added':
-        return <FileText className="w-4 h-4 text-amber-400" />;
+        return <FileText className="w-4 h-4 text-rose-400" />;
       case 'profile_updated':
-        return <Edit className="w-4 h-4 text-violet-400" />;
+        return <Edit className="w-4 h-4 text-rose-400" />;
       default:
         return <CheckCircle2 className="w-4 h-4 text-zinc-400" />;
     }
   };
 
+  const handleThemeToggle = () => {
+    const newTheme = settings.theme === 'dark' ? 'light' : 'dark';
+    const current = localStorage.getItem('matchmaker_settings');
+    const parsed = current ? JSON.parse(current) : {};
+    localStorage.setItem('matchmaker_settings', JSON.stringify({ ...parsed, theme: newTheme }));
+    window.location.reload();
+  };
+
   return (
     <>
-      <header className="h-16 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6">
+      <header className="h-16 border-b border-[var(--border)] bg-[var(--card)]/90 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 shadow-sm">
         {/* Invisible Backdrops for Dropdown click-away */}
         {isNotificationsOpen && (
           <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setIsNotificationsOpen(false)} />
@@ -351,14 +355,14 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
           {/* Toggle Mobile Menu */}
           <button
             onClick={onMenuClick}
-            className="p-2 -ml-2 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60 lg:hidden focus:outline-none focus:ring-1 focus:ring-rose-500/50"
+            className="p-2 -ml-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/60 lg:hidden focus:outline-none focus:ring-1 focus:ring-rose-500/50"
             aria-label="Toggle Sidebar"
           >
             <Menu className="w-5 h-5" />
           </button>
 
           {/* Dynamic Title */}
-          <h2 className="text-base sm:text-lg font-semibold text-zinc-100 tracking-tight">
+          <h2 className="text-base sm:text-lg font-semibold text-[var(--foreground)] tracking-tight">
             {getPageTitle()}
           </h2>
         </div>
@@ -367,7 +371,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
           {/* System Status Alert (Operational Indicator) */}
           <button
             onClick={() => setIsDiagnosticsOpen(true)}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-emerald-950/30 border border-emerald-500/25 hover:border-emerald-500/50 hover:bg-emerald-950/50 rounded-full text-xs text-emerald-400 font-medium transition-all focus:outline-none focus:ring-1 focus:ring-emerald-500/40 select-none cursor-pointer"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-rose-500/10 border border-rose-400/25 hover:border-rose-400/50 hover:bg-rose-500/15 rounded-full text-xs text-rose-500 font-medium transition-all focus:outline-none focus:ring-1 focus:ring-rose-500/40 select-none cursor-pointer"
           >
             <ShieldCheck className="w-3.5 h-3.5 animate-pulse" />
             Systems Online
@@ -377,14 +381,14 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
           <div className="relative">
             <button
               onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-              className={`relative p-2 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60 transition-colors focus:outline-none ${
-                isNotificationsOpen ? 'text-zinc-200 bg-zinc-900/60' : ''
+              className={`relative p-2 rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/60 transition-colors focus:outline-none ${
+                isNotificationsOpen ? 'text-[var(--foreground)] bg-[var(--muted)]/60' : ''
               }`}
               aria-label="View Notifications"
             >
               <Bell className="w-4.5 h-4.5" />
               {settings.notifications.alerts && unreadCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-4 h-4 text-[9px] font-bold text-white bg-rose-500 rounded-full flex items-center justify-center ring-2 ring-zinc-950">
+                <span className="absolute top-1.5 right-1.5 w-4 h-4 text-[9px] font-bold text-white bg-rose-500 rounded-full flex items-center justify-center ring-2 ring-[var(--background)]">
                   {unreadCount}
                 </span>
               )}
@@ -392,9 +396,9 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
 
             {/* Notifications Popover */}
             {isNotificationsOpen && (
-              <div className="absolute right-0 mt-2.5 w-80 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl z-50 overflow-hidden py-1">
-                <div className="flex items-center justify-between px-4 py-2.5 border-b border-zinc-850">
-                  <span className="text-xs font-semibold text-zinc-200">Notifications</span>
+              <div className="absolute right-0 mt-2.5 w-80 bg-[var(--card)] border border-[var(--border)] rounded-xl shadow-2xl z-50 overflow-hidden py-1">
+                <div className="flex items-center justify-between px-4 py-2.5 border-b border-[var(--border)]">
+                  <span className="text-xs font-semibold text-[var(--foreground)]">Notifications</span>
                   {unreadCount > 0 && (
                     <button
                       onClick={markAllAsRead}
@@ -405,7 +409,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
                   )}
                 </div>
 
-                <div className="max-h-80 overflow-y-auto divide-y divide-zinc-850/50">
+                <div className="max-h-80 overflow-y-auto divide-y divide-[var(--border)]/50">
                   {recentActivities.length > 0 ? (
                     recentActivities.map((act) => {
                       const isUnread = !readNotificationIds.includes(act.id);
@@ -413,19 +417,19 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
                         <button
                           key={act.id}
                           onClick={() => handleNotificationClick(act)}
-                          className={`w-full text-left px-4 py-3 hover:bg-zinc-850/40 flex gap-3 transition-colors focus:outline-none ${
-                            isUnread ? 'bg-rose-500/[0.01]' : ''
+                          className={`w-full text-left px-4 py-3 hover:bg-[var(--muted)]/40 flex gap-3 transition-colors focus:outline-none ${
+                            isUnread ? 'bg-rose-500/[0.04]' : ''
                           }`}
                         >
-                          <div className="w-8 h-8 rounded-lg bg-zinc-800/80 border border-zinc-700/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <div className="w-8 h-8 rounded-lg bg-[var(--muted)] border border-[var(--border)] flex items-center justify-center flex-shrink-0 mt-0.5">
                             {getActivityIcon(act.type)}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className={`text-xs text-zinc-300 truncate leading-snug ${isUnread ? 'font-medium text-zinc-100' : ''}`}>
+                            <p className={`text-xs text-[var(--card-foreground)] truncate leading-snug ${isUnread ? 'font-medium' : 'opacity-80'}`}>
                               {act.details}
                             </p>
-                            <div className="flex items-center justify-between mt-1 text-[10px] text-zinc-500">
-                              <span className="truncate max-w-[120px] font-semibold text-zinc-400">{act.customerName}</span>
+                            <div className="flex items-center justify-between mt-1 text-[10px] text-[var(--muted-foreground)]">
+                              <span className="truncate max-w-[120px] font-semibold">{act.customerName}</span>
                               <span>{getRelativeTime(act.timestamp)}</span>
                             </div>
                           </div>
@@ -436,9 +440,9 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
                       );
                     })
                   ) : (
-                    <div className="py-8 text-center text-zinc-550 flex flex-col items-center gap-2">
-                      <Bell className="w-8 h-8 text-zinc-800" />
-                      <p className="text-xs">No recent notifications</p>
+                    <div className="py-8 text-center flex flex-col items-center gap-2">
+                      <Bell className="w-8 h-8 text-[var(--muted-foreground)]/40" />
+                      <p className="text-xs text-[var(--muted-foreground)]">No recent notifications</p>
                     </div>
                   )}
                 </div>
@@ -446,18 +450,57 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
             )}
           </div>
 
+          {/* Dark Mode Toggle Button */}
+          <button
+            onClick={handleThemeToggle}
+            className={`group relative hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[11px] font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-rose-500/40 overflow-hidden ${
+              settings.theme === 'dark'
+                ? 'bg-rose-500/15 border-rose-400/40 text-rose-300 hover:bg-rose-500/25 hover:text-rose-200'
+                : 'bg-rose-50 border-rose-300 text-rose-600 hover:bg-rose-100 hover:border-rose-400 hover:text-rose-700'
+            }`}
+            aria-label="Toggle dark/light mode"
+            title={settings.theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {/* Icon */}
+            <span className="relative transition-transform duration-500 group-hover:scale-110">
+              {settings.theme === 'dark' ? (
+                <Sun className="w-3.5 h-3.5" />
+              ) : (
+                <Moon className="w-3.5 h-3.5" />
+              )}
+            </span>
+            
+            {/* Label */}
+            <span className="relative tracking-wide">
+              {settings.theme === 'dark' ? 'Light' : 'Dark'}
+            </span>
+          </button>
+
+          {/* Mobile-only icon-only dark mode button */}
+          <button
+            onClick={handleThemeToggle}
+            className="sm:hidden p-2 rounded-xl border border-rose-400/25 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 hover:border-rose-400/50 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-rose-500/40"
+            aria-label="Toggle dark/light mode"
+          >
+            {settings.theme === 'dark' ? (
+              <Sun className="w-4 h-4" />
+            ) : (
+              <Moon className="w-4 h-4" />
+            )}
+          </button>
+
           {/* Matchmaker Session Avatar & Dropdown */}
           <div className="relative">
             <button
               onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="flex items-center gap-2.5 pl-2 border-l border-zinc-900 text-left hover:opacity-90 active:scale-98 transition-all focus:outline-none"
+              className="flex items-center gap-2.5 pl-2 border-l border-[var(--border)] text-left hover:opacity-90 active:scale-98 transition-all focus:outline-none"
               aria-label="User profile menu"
             >
               {settings.avatarUrl ? (
                 <img
                   src={settings.avatarUrl}
                   alt={settings.name}
-                  className="w-8 h-8 rounded-lg object-cover shadow-md border border-zinc-800/80"
+                  className="w-8 h-8 rounded-lg object-cover shadow-md border border-[var(--border)]"
                 />
               ) : (
                 <div className={`w-8 h-8 rounded-lg bg-gradient-to-tr ${getAvatarBg()} flex items-center justify-center text-xs font-bold text-white shadow-md`}>
@@ -465,24 +508,24 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
                 </div>
               )}
               <div className="hidden md:block text-left">
-                <p className="text-xs font-semibold text-zinc-300">{settings.name || 'Maggie Crew'}</p>
-                <p className="text-[10px] text-zinc-500">{settings.title || 'Senior Matchmaker'}</p>
+                <p className="text-xs font-semibold text-[var(--foreground)]">{settings.name || 'Maggie Crew'}</p>
+                <p className="text-[10px] text-[var(--muted-foreground)]">{settings.title || 'Senior Matchmaker'}</p>
               </div>
             </button>
 
             {/* Profile Popover */}
             {isProfileOpen && (
-              <div className="absolute right-0 mt-2.5 w-64 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl z-50 overflow-hidden py-1.5 divide-y divide-zinc-850">
+              <div className="absolute right-0 mt-2.5 w-64 bg-[var(--card)] border border-[var(--border)] rounded-xl shadow-2xl z-50 overflow-hidden py-1.5 divide-y divide-[var(--border)]">
                 <button
                   type="button"
                   onClick={openProfileModal}
-                  className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-zinc-850/30 transition-colors focus:outline-none group"
+                  className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-[var(--muted)]/30 transition-colors focus:outline-none group"
                 >
                   {settings.avatarUrl ? (
                     <img
                       src={settings.avatarUrl}
                       alt={settings.name}
-                      className="w-10 h-10 rounded-lg object-cover shadow-inner border border-zinc-800/80 flex-shrink-0"
+                      className="w-10 h-10 rounded-lg object-cover shadow-inner border border-[var(--border)] flex-shrink-0"
                     />
                   ) : (
                     <div className={`w-10 h-10 rounded-lg bg-gradient-to-tr ${getAvatarBg()} flex items-center justify-center text-sm font-bold text-white shadow-inner flex-shrink-0 group-hover:scale-98 transition-all`}>
@@ -490,9 +533,9 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-bold text-zinc-200 truncate group-hover:text-rose-400 transition-colors">{settings.name || 'Maggie Crew'}</p>
-                    <p className="text-[10px] text-zinc-500 truncate">{settings.title || 'Senior Matchmaker'}</p>
-                    <p className="text-[9px] text-zinc-650 truncate mt-0.5">{settings.email || settings.phone || 'maggie@thedatecrew.com'}</p>
+                    <p className="text-xs font-bold text-[var(--foreground)] truncate group-hover:text-rose-400 transition-colors">{settings.name || 'Maggie Crew'}</p>
+                    <p className="text-[10px] text-[var(--muted-foreground)] truncate">{settings.title || 'Senior Matchmaker'}</p>
+                    <p className="text-[9px] text-[var(--muted-foreground)]/70 truncate mt-0.5">{settings.email || settings.phone || 'maggie@thedatecrew.com'}</p>
                   </div>
                 </button>
 
@@ -502,16 +545,16 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
                       setIsProfileOpen(false);
                       router.push('/dashboard/settings');
                     }}
-                    className="w-full text-left px-4 py-2 hover:bg-zinc-850 text-xs text-zinc-300 hover:text-zinc-100 flex items-center gap-2 transition-colors focus:outline-none"
+                    className="w-full text-left px-4 py-2 hover:bg-[var(--muted)] text-xs text-[var(--card-foreground)] hover:text-[var(--foreground)] flex items-center gap-2 transition-colors focus:outline-none"
                   >
-                    <Settings className="w-3.5 h-3.5 text-zinc-500" />
+                    <Settings className="w-3.5 h-3.5 text-[var(--muted-foreground)]" />
                     System Settings
                   </button>
                   <button
                     onClick={handleResetDatabase}
-                    className="w-full text-left px-4 py-2 hover:bg-zinc-850 text-xs text-zinc-300 hover:text-rose-450 flex items-center gap-2 transition-colors focus:outline-none"
+                    className="w-full text-left px-4 py-2 hover:bg-[var(--muted)] text-xs text-[var(--card-foreground)] hover:text-rose-400 flex items-center gap-2 transition-colors focus:outline-none"
                   >
-                    <Database className="w-3.5 h-3.5 text-zinc-500" />
+                    <Database className="w-3.5 h-3.5 text-[var(--muted-foreground)]" />
                     Reset CRM Database
                   </button>
                 </div>
@@ -523,7 +566,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
                       document.cookie = "auth_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                       window.location.href = '/dashboard';
                     }}
-                    className="w-full text-left px-4 py-2 hover:bg-zinc-850 text-xs text-rose-500 hover:text-rose-400 flex items-center gap-2 transition-colors focus:outline-none"
+                    className="w-full text-left px-4 py-2 hover:bg-[var(--muted)] text-xs text-rose-500 hover:text-rose-400 flex items-center gap-2 transition-colors focus:outline-none"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     Secure Sign Out
@@ -539,7 +582,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
       {isProfileModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm overflow-y-auto">
           <div className="relative w-full max-w-2xl overflow-hidden border bg-zinc-900 border-zinc-800 rounded-2xl shadow-2xl p-6 md:p-8 space-y-6">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-violet-600" />
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-rose-300" />
             
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-zinc-100 flex items-center gap-2">
@@ -757,25 +800,19 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
 
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Workspace Theme Color</label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {(['dark', 'rose', 'midnight', 'emerald'] as const).map((t) => (
+                  <div className="grid grid-cols-2 gap-2">
+                    {(['light', 'dark'] as const).map((t) => (
                       <button
                         key={t}
                         type="button"
                         onClick={() => setProfileTheme(t)}
                         className={`py-2 text-[10px] font-bold uppercase tracking-wider rounded-xl border transition-all capitalize ${
                           profileTheme === t
-                            ? t === 'rose'
-                              ? 'bg-rose-950/20 border-rose-500 text-rose-450'
-                              : t === 'midnight'
-                              ? 'bg-indigo-950/20 border-indigo-500 text-indigo-400'
-                              : t === 'emerald'
-                              ? 'bg-emerald-950/20 border-emerald-500 text-emerald-450'
-                              : 'bg-zinc-805 border-zinc-500 text-zinc-100'
+                            ? 'bg-rose-500/10 border-rose-500 text-rose-450'
                             : 'bg-zinc-950 border-zinc-850 text-zinc-500 hover:text-zinc-350 hover:border-zinc-750'
                         }`}
                       >
-                        {t}
+                        {t === 'light' ? 'Light Mode' : 'Dark Mode'}
                       </button>
                     ))}
                   </div>
@@ -794,7 +831,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 bg-gradient-to-r from-rose-500 to-violet-600 hover:from-rose-600 hover:to-violet-700 text-white font-bold text-xs rounded-xl shadow-md transition-all active:scale-[0.98]"
+                    className="px-5 py-2 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-bold text-xs rounded-xl shadow-md transition-all active:scale-[0.98]"
                   >
                     Save Profile Changes
                   </button>
@@ -810,12 +847,12 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
       {isDiagnosticsOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-sm">
           <div className="relative w-full max-w-lg overflow-hidden border bg-zinc-900 border-zinc-800 rounded-2xl shadow-2xl p-6 space-y-6">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-pink-400" />
             
             {/* Modal Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Server className="w-5 h-5 text-emerald-400 animate-pulse" />
+                <Server className="w-5 h-5 text-rose-400 animate-pulse" />
                 <h3 className="text-lg font-semibold text-zinc-100">System Control & Diagnostics</h3>
               </div>
               <button
@@ -834,16 +871,16 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
               <div className="p-3 bg-zinc-950 border border-zinc-800/60 rounded-xl">
                 <p className="text-[10px] text-zinc-500 uppercase font-semibold tracking-wider">Client Registry</p>
                 <p className="text-xl font-bold text-zinc-200 mt-1">{customers.length} Profiles</p>
-                <span className="text-[10px] text-emerald-400 flex items-center gap-1 mt-1 font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                <span className="text-[10px] text-rose-400 flex items-center gap-1 mt-1 font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
                   Synced & Safe
                 </span>
               </div>
               <div className="p-3 bg-zinc-950 border border-zinc-800/60 rounded-xl">
                 <p className="text-[10px] text-zinc-500 uppercase font-semibold tracking-wider">Match Proposals</p>
                 <p className="text-xl font-bold text-zinc-200 mt-1">{matches.length} Pairs</p>
-                <span className="text-[10px] text-emerald-400 flex items-center gap-1 mt-1 font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span className="text-[10px] text-rose-400 flex items-center gap-1 mt-1 font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                   Matching Engine Online
                 </span>
               </div>
@@ -859,9 +896,9 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
               <div className="p-3 bg-zinc-900 border border-zinc-850 rounded-lg text-xs space-y-2">
                 <div className="flex items-center gap-2">
                   {diagnosticProgress === 100 ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-rose-400 flex-shrink-0" />
                   ) : diagnosticProgress !== null ? (
-                    <Loader2 className="w-4 h-4 text-emerald-400 animate-spin flex-shrink-0" />
+                    <Loader2 className="w-4 h-4 text-pink-400 animate-spin flex-shrink-0" />
                   ) : (
                     <Activity className="w-4 h-4 text-zinc-500 flex-shrink-0" />
                   )}
@@ -872,7 +909,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
                   <div className="space-y-1">
                     <div className="w-full h-1.5 bg-zinc-950 rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-150" 
+                        className="h-full bg-gradient-to-r from-rose-500 to-pink-400 transition-all duration-150" 
                         style={{ width: `${diagnosticProgress}%` }}
                       />
                     </div>
@@ -886,7 +923,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
               <button
                 onClick={runDiagnostics}
                 disabled={diagnosticProgress !== null && diagnosticProgress < 100}
-                className="w-full py-2 px-3 bg-emerald-600/10 border border-emerald-500/20 hover:bg-emerald-600/20 active:bg-emerald-600/30 disabled:opacity-50 text-emerald-400 hover:text-emerald-300 font-medium text-xs rounded-lg transition-all flex items-center justify-center gap-1.5 focus:outline-none"
+                className="w-full py-2 px-3 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 active:bg-rose-500/30 disabled:opacity-50 text-rose-400 hover:text-rose-300 font-medium text-xs rounded-lg transition-all flex items-center justify-center gap-1.5 focus:outline-none"
               >
                 {diagnosticProgress !== null && diagnosticProgress < 100 ? (
                   <>

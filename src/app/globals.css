@@ -1,26 +1,175 @@
 @import "tailwindcss";
 
 :root {
-  --background: #09090b;
-  --foreground: #f4f4f5;
-  --card: #18181b;
-  --card-foreground: #f4f4f5;
-  --popover: #09090b;
-  --popover-foreground: #f4f4f5;
-  --primary: #f43f5e;
-  --primary-foreground: #fff;
-  --secondary: #27272a;
-  --secondary-foreground: #fafafa;
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
-  --accent: #27272a;
-  --accent-foreground: #fafafa;
-  --destructive: #ef4444;
-  --destructive-foreground: #fafafa;
-  --border: #27272a;
-  --input: #27272a;
-  --ring: #f43f5e;
   --radius: 0.75rem;
+
+  /* Default to Light Theme (Clean White - Light Mode) */
+  --background: #f8f9fa;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+  --primary: #e05275;
+  --primary-foreground: #fff;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #111827;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --accent: #fce7f3;
+  --accent-foreground: #111827;
+  --destructive: #be123c;
+  --destructive-foreground: #fafafa;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #e05275;
+
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(229, 231, 235, 0.8);
+  --glass-hover-bg: rgba(255, 255, 255, 0.98);
+  --glass-hover-border: rgba(224, 82, 117, 0.3);
+  --grid-color: rgba(156, 163, 175, 0.08);
+  --scrollbar-thumb: #d1d5db;
+
+  --zinc-950: #f8f9fa;
+  --zinc-900: #ffffff;
+  --zinc-850: #f9fafb;
+  --zinc-800: #f3f4f6;
+  --zinc-700: #e5e7eb;
+  --zinc-650: #9ca3af;
+  --zinc-500: #6b7280;
+  --zinc-400: #374151;
+  --zinc-350: #1f2937;
+  --zinc-300: #111827;
+  --zinc-200: #0f172a;
+  --zinc-100: #030712;
+  --zinc-50: #ffffff;
+}
+
+/* Theme Classes to customize color variables dynamically */
+
+.theme-light {
+  --background: #f8f9fa;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+  --primary: #e05275;
+  --primary-foreground: #fff;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #111827;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --accent: #fce7f3;
+  --accent-foreground: #111827;
+  --destructive: #be123c;
+  --destructive-foreground: #fafafa;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #e05275;
+
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(229, 231, 235, 0.8);
+  --glass-hover-bg: rgba(255, 255, 255, 0.98);
+  --glass-hover-border: rgba(224, 82, 117, 0.3);
+  --grid-color: rgba(156, 163, 175, 0.08);
+  --scrollbar-thumb: #d1d5db;
+
+  --zinc-950: #f8f9fa;
+  --zinc-900: #ffffff;
+  --zinc-850: #f9fafb;
+  --zinc-800: #f3f4f6;
+  --zinc-700: #e5e7eb;
+  --zinc-650: #9ca3af;
+  --zinc-500: #6b7280;
+  --zinc-400: #374151;
+  --zinc-350: #1f2937;
+  --zinc-300: #111827;
+  --zinc-200: #0f172a;
+  --zinc-100: #030712;
+  --zinc-50: #ffffff;
+
+  /* ─── Override Tailwind color utilities for light mode ──────────────────────
+     Same pattern as .theme-dark: re-declare --color-zinc-* so that all
+     text-zinc-*, bg-zinc-*, border-zinc-* Tailwind utilities use the
+     light-mode zinc scale, not whatever was last set at :root. */
+  --color-zinc-950: #f8f9fa;
+  --color-zinc-900: #ffffff;
+  --color-zinc-850: #f9fafb;
+  --color-zinc-800: #f3f4f6;
+  --color-zinc-700: #e5e7eb;
+  --color-zinc-650: #9ca3af;
+  --color-zinc-500: #6b7280;
+  --color-zinc-400: #374151;
+  --color-zinc-350: #1f2937;
+  --color-zinc-300: #111827;
+  --color-zinc-200: #0f172a;
+  --color-zinc-100: #030712;
+  --color-zinc-50:  #ffffff;
+}
+
+.theme-dark {
+  /* ── Calm, eye-friendly dark palette ──────────────────────────────────────
+     Warm charcoal-gray tones instead of harsh near-black.
+     Background sits around #1e1f26 so it feels dark but not oppressive.
+     Foreground is a soft off-white #e8eaed — readable without eye strain. */
+  --background: #1e1f26;
+  --foreground: #e8eaed;
+  --card: #252630;
+  --card-foreground: #e8eaed;
+  --popover: #252630;
+  --popover-foreground: #e8eaed;
+  --primary: #e05275;
+  --primary-foreground: #fff;
+  --secondary: #2c2d38;
+  --secondary-foreground: #e2e4ea;
+  --muted: #2c2d38;
+  --muted-foreground: #9ca3b0;
+  --accent: #32202b;
+  --accent-foreground: #f0d6df;
+  --destructive: #be123c;
+  --destructive-foreground: #fafafa;
+  --border: #353644;
+  --input: #35364a;
+  --ring: #e05275;
+
+  --glass-bg: rgba(37, 38, 48, 0.75);
+  --glass-border: rgba(53, 54, 68, 0.85);
+  --glass-hover-bg: rgba(44, 45, 56, 0.90);
+  --glass-hover-border: rgba(224, 82, 117, 0.35);
+  --grid-color: rgba(255, 255, 255, 0.03);
+  --scrollbar-thumb: #35364a;
+
+  /* Zinc scale remapped to calm dark grays */
+  --zinc-950: #1e1f26;
+  --zinc-900: #252630;
+  --zinc-850: #2c2d38;
+  --zinc-800: #35364a;
+  --zinc-700: #44455c;
+  --zinc-650: #72748a;
+  --zinc-500: #9ca3b0;
+  --zinc-400: #c4c8d6;
+  --zinc-350: #d8dbe8;
+  --zinc-300: #e8eaed;
+  --zinc-200: #f2f4f7;
+  --zinc-100: #ffffff;
+  --zinc-50:  #2c2d38;
+
+  /* ─── Tailwind utility overrides — same reason as .theme-light ──────────── */
+  --color-zinc-950: #1e1f26;
+  --color-zinc-900: #252630;
+  --color-zinc-850: #2c2d38;
+  --color-zinc-800: #35364a;
+  --color-zinc-700: #44455c;
+  --color-zinc-650: #72748a;
+  --color-zinc-500: #9ca3b0;
+  --color-zinc-400: #c4c8d6;
+  --color-zinc-350: #d8dbe8;
+  --color-zinc-300: #e8eaed;
+  --color-zinc-200: #f2f4f7;
+  --color-zinc-100: #ffffff;
+  --color-zinc-50:  #2c2d38;
 }
 
 @theme {
@@ -47,6 +196,27 @@
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
+
+  /* Map basic zinc scales dynamically */
+  --color-zinc-950: var(--zinc-950);
+  --color-zinc-900: var(--zinc-900);
+  --color-zinc-850: var(--zinc-850);
+  --color-zinc-800: var(--zinc-800);
+  --color-zinc-700: var(--zinc-700);
+  --color-zinc-650: var(--zinc-650);
+  --color-zinc-500: var(--zinc-500);
+  --color-zinc-400: var(--zinc-400);
+  --color-zinc-350: var(--zinc-350);
+  --color-zinc-300: var(--zinc-300);
+  --color-zinc-200: var(--zinc-200);
+  --color-zinc-100: var(--zinc-100);
+  --color-zinc-50: var(--zinc-50);
+
+  /* Rose accent scale — the primary dating brand color */
+  --color-rose-400: #f0859c;
+  --color-rose-500: #e05275;
+  --color-rose-600: #be3855;
+  --color-rose-950: #250b12;
 }
 
 body {
@@ -55,18 +225,52 @@ body {
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
+/* ============================
+   Full-page theme enforcement
+   ============================ */
+
+/* Ensure the entire dark-mode wrapper fills with the right background */
+.theme-dark {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+.theme-dark main,
+.theme-dark aside {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* Ensure all text in dark mode is readable */
+.theme-dark .glass-panel {
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
+}
+
+/* Light mode enforcement */
+.theme-light {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+.theme-light main,
+.theme-light aside {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
 /* Glassmorphism helpers */
 .glass-panel {
-  background: rgba(24, 24, 27, 0.6);
+  background: var(--glass-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(63, 63, 70, 0.4);
+  border: 1px solid var(--glass-border);
 }
 
 .glass-panel-hover:hover {
-  background: rgba(39, 39, 42, 0.7);
-  border-color: rgba(244, 63, 94, 0.3);
-  box-shadow: 0 4px 20px -2px rgba(244, 63, 94, 0.1);
+  background: var(--glass-hover-bg);
+  border-color: var(--glass-hover-border);
+  box-shadow: 0 4px 20px -2px rgba(224, 82, 117, 0.08);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -81,12 +285,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3f3f46;
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #f43f5e;
+  background: #e05275;
 }
 
 /* ============================
@@ -160,13 +364,10 @@ body {
 
 .animate-orb-3 {
   animation: orb-float-3 24s infinite alternate ease-in-out;
-}
-
-/* Subtle tech grid pattern */
+}/* Subtle tech grid pattern */
 .bg-grid-pattern {
   background-size: 50px 50px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
 }
-

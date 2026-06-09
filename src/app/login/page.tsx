@@ -10,7 +10,7 @@ interface MatchmakerAccount {
   password: string;
   name: string;
   title: string;
-  theme: 'rose' | 'midnight' | 'emerald' | 'dark';
+  theme: 'light' | 'dark';
 }
 
 const PRESET_ACCOUNTS: MatchmakerAccount[] = [
@@ -20,7 +20,7 @@ const PRESET_ACCOUNTS: MatchmakerAccount[] = [
     password: 'password123',
     name: 'Maggie Crew',
     title: 'Senior Matchmaker',
-    theme: 'rose'
+    theme: 'light'
   },
   {
     email: 'william@thedatecrew.com',
@@ -28,7 +28,7 @@ const PRESET_ACCOUNTS: MatchmakerAccount[] = [
     password: 'password456',
     name: 'William Sterling',
     title: 'Lead Matchmaker',
-    theme: 'midnight'
+    theme: 'dark'
   },
   {
     email: 'chloe@thedatecrew.com',
@@ -36,7 +36,7 @@ const PRESET_ACCOUNTS: MatchmakerAccount[] = [
     password: 'password789',
     name: 'Chloe Valance',
     title: 'Associate Matchmaker',
-    theme: 'emerald'
+    theme: 'light'
   },
   {
     email: 'alex@thedatecrew.com',
@@ -59,7 +59,7 @@ export default function LoginPage() {
   const [showRegister, setShowRegister] = useState(false);
   const [newName, setNewName] = useState('');
   const [newTitle, setNewTitle] = useState('');
-  const [newTheme, setNewTheme] = useState<'rose' | 'midnight' | 'emerald' | 'dark'>('dark');
+  const [newTheme, setNewTheme] = useState<'light' | 'dark'>('light');
   
   const [showPresetPanel, setShowPresetPanel] = useState(true);
   const [customAccounts, setCustomAccounts] = useState<MatchmakerAccount[]>([]);
@@ -205,27 +205,14 @@ export default function LoginPage() {
     setShowRegister(false);
   };
 
+  const loginThemeClass = showRegister ? `theme-${newTheme}` : `theme-light`;
+
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center bg-zinc-950 overflow-y-auto py-12 px-4">
-      {/* Dynamic Background System */}
+    <div className={`relative min-h-screen flex flex-col items-center justify-center bg-zinc-950 overflow-y-auto py-12 px-4 ${loginThemeClass}`}>
+      {/* Subtle Background System */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 select-none">
-        {/* Subtle Tech Grid Pattern */}
-        <div className="absolute inset-0 bg-grid-pattern opacity-60" />
-
-        {/* Interactive Cursor Spotlight Glow */}
-        <div 
-          className={`absolute inset-0 transition-opacity duration-1000 ${hasMoved ? 'opacity-60' : 'opacity-0'}`}
-          style={{
-            background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(244, 63, 94, 0.08), rgba(139, 92, 246, 0.05), transparent 80%)`
-          }}
-        />
-
-        {/* Floating animated background mesh orbs */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-          <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full blur-[120px] animate-orb-1 bg-rose-500/10" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full blur-[130px] animate-orb-2 bg-violet-600/10" />
-          <div className="absolute top-[35%] left-[20%] w-[450px] h-[450px] rounded-full blur-[110px] animate-orb-3 bg-amber-500/5" />
-        </div>
+        {/* Very faint grid pattern */}
+        <div className="absolute inset-0 bg-grid-pattern opacity-30" />
       </div>
 
 
@@ -233,28 +220,28 @@ export default function LoginPage() {
       <div className="w-full max-w-md z-10 space-y-6">
         {/* Logo Header */}
         <div className="text-center flex flex-col items-center">
-          <div className="relative flex items-center justify-center w-14 h-14 rounded-2xl bg-zinc-900/80 border border-zinc-800 shadow-xl mb-4 group hover:border-rose-500/50 transition-all duration-300">
+          <div className="relative flex items-center justify-center w-14 h-14 rounded-2xl bg-white border border-zinc-200 shadow-lg mb-4 group hover:border-rose-400/60 hover:shadow-rose-100 transition-all duration-300">
             <Heart className="w-6 h-6 text-rose-500 group-hover:scale-110 transition-transform duration-300 fill-rose-500/20" />
-            <Sparkles className="w-3.5 h-3.5 text-violet-400 absolute top-2 right-2 animate-pulse" />
+            <Sparkles className="w-3.5 h-3.5 text-rose-400 absolute top-2 right-2 animate-pulse" />
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-zinc-50 via-rose-300 to-violet-400">
+          <h1 className="text-3xl font-extrabold tracking-tight text-zinc-800">
             The Date Crew
           </h1>
-          <p className="text-sm text-zinc-400 mt-2 font-medium">
+          <p className="text-sm text-zinc-500 mt-2 font-medium">
             Matchmaker Portal & CRM Control
           </p>
         </div>
 
         {/* Form Panel */}
-        <div className="glass-panel rounded-2xl p-8 shadow-2xl relative border-zinc-800/80">
-          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-rose-500/20 to-transparent" />
+        <div className="bg-white rounded-2xl p-8 shadow-lg relative border border-zinc-200">
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-rose-400/30 to-transparent" />
           
-          <h2 className="text-xl font-semibold text-zinc-100 mb-6">
+          <h2 className="text-xl font-semibold text-zinc-800 mb-6">
             {showRegister ? 'Create Matchmaker Account' : 'Authorized Personnel Login'}
           </h2>
 
           {error && (
-            <div className="p-3 bg-red-950/40 border border-red-500/30 rounded-xl text-xs text-red-300 mb-5 animate-fadeIn">
+            <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 mb-5 animate-fadeIn">
               {error}
             </div>
           )}
@@ -263,12 +250,12 @@ export default function LoginPage() {
             /* Login Form */
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center justify-between">
+                <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500 flex items-center justify-between">
                   <span>Email or Phone Number</span>
-                  <span className="text-[10px] text-zinc-500">Preset / Custom</span>
+                  <span className="text-[10px] text-zinc-400">Preset / Custom</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-500">
+                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
                     {emailOrPhone.includes('@') ? (
                       <Mail className="w-4 h-4" />
                     ) : (
@@ -280,18 +267,18 @@ export default function LoginPage() {
                     required
                     value={emailOrPhone}
                     onChange={(e) => setEmailOrPhone(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/60 border border-zinc-800 rounded-xl text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-rose-500 focus:border-rose-500/50 transition-all duration-200 text-sm"
+                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-zinc-200 rounded-xl text-zinc-800 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-rose-400 focus:border-rose-400/60 transition-all duration-200 text-sm"
                     placeholder="name@thedatecrew.com or +1 555-..."
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
                   Security Password
                 </label>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-500">
+                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
                     <Lock className="w-4 h-4" />
                   </span>
                   <input
@@ -299,7 +286,7 @@ export default function LoginPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/60 border border-zinc-800 rounded-xl text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-rose-500 focus:border-rose-500/50 transition-all duration-200 text-sm"
+                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-zinc-200 rounded-xl text-zinc-800 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-rose-400 focus:border-rose-400/60 transition-all duration-200 text-sm"
                     placeholder="Enter security password"
                   />
                 </div>
@@ -309,7 +296,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="relative w-full py-3 bg-gradient-to-r from-rose-500 to-violet-600 text-white rounded-xl text-sm font-semibold hover:from-rose-600 hover:to-violet-700 focus:outline-none focus:ring-2 focus:ring-rose-500/50 active:scale-[0.98] transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden shadow-lg shadow-rose-950/20 group"
+                  className="relative w-full py-3 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-xl text-sm font-semibold hover:from-rose-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-rose-500/50 active:scale-[0.98] transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden shadow-lg shadow-rose-950/20 group"
                 >
                   {isLoading ? (
                     <span className="flex items-center justify-center gap-2">
@@ -383,25 +370,19 @@ export default function LoginPage() {
                 <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
                   Dashboard Theme Color
                 </label>
-                <div className="grid grid-cols-4 gap-2">
-                  {(['dark', 'rose', 'midnight', 'emerald'] as const).map((t) => (
+                <div className="grid grid-cols-2 gap-2">
+                  {(['light', 'dark'] as const).map((t) => (
                     <button
                       key={t}
                       type="button"
                       onClick={() => setNewTheme(t)}
                       className={`py-2 text-xs font-semibold rounded-xl border transition-all capitalize select-none ${
                         newTheme === t
-                          ? t === 'rose'
-                            ? 'bg-rose-950/30 border-rose-500 text-rose-400'
-                            : t === 'midnight'
-                            ? 'bg-indigo-950/30 border-indigo-500 text-indigo-400'
-                            : t === 'emerald'
-                            ? 'bg-emerald-950/30 border-emerald-500 text-emerald-400'
-                            : 'bg-zinc-900 border-zinc-400 text-zinc-100'
+                          ? 'bg-rose-500/10 border-rose-500 text-rose-450'
                           : 'bg-zinc-900/40 border-zinc-850 text-zinc-500 hover:text-zinc-300 hover:border-zinc-700'
                       }`}
                     >
-                      {t}
+                      {t === 'light' ? 'Light Mode' : 'Dark Mode'}
                     </button>
                   ))}
                 </div>
@@ -418,7 +399,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex-1 py-2.5 bg-gradient-to-r from-rose-500 to-violet-600 hover:from-rose-600 hover:to-violet-700 text-white rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2.5 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-1.5"
                 >
                   {isLoading ? (
                     <>
@@ -438,10 +419,10 @@ export default function LoginPage() {
         </div>
 
         {/* Accordion List of Available Accounts for quick reference */}
-        <div className="glass-panel rounded-2xl border-zinc-800/80 shadow-md overflow-hidden">
+        <div className="glass-panel rounded-2xl border-zinc-200/80 shadow-sm overflow-hidden">
           <button
             onClick={() => setShowPresetPanel(!showPresetPanel)}
-            className="w-full px-6 py-4 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-zinc-400 hover:text-zinc-200 transition-colors select-none focus:outline-none"
+            className="w-full px-6 py-4 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-zinc-500 hover:text-zinc-700 transition-colors select-none focus:outline-none"
           >
             <span className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-rose-500" />
@@ -455,14 +436,14 @@ export default function LoginPage() {
           </button>
 
           {showPresetPanel && (
-            <div className="px-6 pb-4 border-t border-zinc-850 divide-y divide-zinc-900">
+            <div className="px-6 pb-4 border-t border-zinc-100 divide-y divide-zinc-100">
               {PRESET_ACCOUNTS.map((acc) => (
                 <div
                   key={acc.email}
                   className="py-3 flex items-center justify-between gap-3 text-xs"
                 >
                   <div>
-                    <p className="font-bold text-zinc-300">{acc.name}</p>
+                    <p className="font-bold text-zinc-700">{acc.name}</p>
                     <p className="text-[10px] text-zinc-500">{acc.title}</p>
                     <div className="flex gap-3 text-[10px] text-zinc-400 font-mono mt-0.5">
                       <span>{acc.email}</span>
@@ -472,7 +453,7 @@ export default function LoginPage() {
                   </div>
                   <button
                     onClick={() => autofill(acc)}
-                    className="px-2.5 py-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-850 text-zinc-300 hover:text-zinc-100 rounded-lg font-semibold tracking-wide transition-all scale-95 active:scale-90 select-none focus:outline-none"
+                    className="px-2.5 py-1 bg-white border border-zinc-200 hover:bg-rose-50 hover:border-rose-300 text-zinc-600 hover:text-rose-600 rounded-lg font-semibold tracking-wide transition-all scale-95 active:scale-90 select-none focus:outline-none"
                   >
                     Quick Fill
                   </button>

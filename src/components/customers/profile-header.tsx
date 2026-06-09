@@ -15,10 +15,10 @@ export default function ProfileHeader({ customer, currentStatus, onStatusChange 
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
 
   const statuses: { value: CustomerStatus; label: string; color: string; dot: string }[] = [
-    { value: 'active', label: 'Active Matching', color: 'bg-emerald-950/40 border-emerald-500/20 text-emerald-400 hover:bg-emerald-900/30', dot: 'bg-emerald-400' },
-    { value: 'paused', label: 'On Hold / Paused', color: 'bg-amber-950/40 border-amber-500/20 text-amber-400 hover:bg-amber-900/30', dot: 'bg-amber-400' },
-    { value: 'matched', label: 'Successfully Matched', color: 'bg-rose-950/40 border-rose-500/20 text-rose-400 hover:bg-rose-900/30', dot: 'bg-rose-400' },
-    { value: 'inactive', label: 'Inactive / Closed', color: 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-800', dot: 'bg-zinc-500' }
+    { value: 'active', label: 'Active Matching', color: 'bg-emerald-100 border-emerald-300 text-emerald-700 hover:bg-emerald-200', dot: 'bg-emerald-500' },
+    { value: 'paused', label: 'On Hold / Paused', color: 'bg-amber-100 border-amber-300 text-amber-700 hover:bg-amber-200', dot: 'bg-amber-500' },
+    { value: 'matched', label: 'Successfully Matched', color: 'bg-rose-100 border-rose-300 text-rose-700 hover:bg-rose-200', dot: 'bg-rose-500' },
+    { value: 'inactive', label: 'Inactive / Closed', color: 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-200', dot: 'bg-gray-400' }
   ];
 
   const activeStatus = statuses.find(s => s.value === currentStatus) || statuses[0];
@@ -56,7 +56,7 @@ export default function ProfileHeader({ customer, currentStatus, onStatusChange 
               <button
                 type="button"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold shadow-sm transition-all focus:outline-none focus:ring-1 focus:ring-rose-500/50 cursor-pointer ${activeStatus.color}`}
+                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-bold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-rose-500/40 cursor-pointer ${activeStatus.color}`}
               >
                 <span className={`w-1.5 h-1.5 rounded-full ${activeStatus.dot}`} />
                 {activeStatus.label}
@@ -66,8 +66,8 @@ export default function ProfileHeader({ customer, currentStatus, onStatusChange 
               {dropdownOpen && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setDropdownOpen(false)} />
-                  <div className="absolute right-0 mt-2 w-48 rounded-xl bg-zinc-900 border border-zinc-800 shadow-xl z-20 p-1.5 animate-fadeIn">
-                    <div className="px-2.5 py-1.5 text-[9px] font-bold text-zinc-500 uppercase tracking-wider border-b border-zinc-800 mb-1">
+                  <div className="absolute right-0 mt-2 w-52 rounded-xl bg-white border border-gray-200 shadow-xl z-20 p-1.5 animate-fadeIn">
+                    <div className="px-2.5 py-1.5 text-[9px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 mb-1">
                       Update Profile Status
                     </div>
                     {statuses.map((s) => (
@@ -80,8 +80,8 @@ export default function ProfileHeader({ customer, currentStatus, onStatusChange 
                         }}
                         className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium text-left transition-colors ${
                           currentStatus === s.value
-                            ? 'bg-zinc-800 text-zinc-200'
-                            : 'text-zinc-400 hover:bg-zinc-950 hover:text-zinc-200'
+                            ? 'bg-gray-100 text-gray-800'
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                         }`}
                       >
                         <span className="flex items-center gap-2">

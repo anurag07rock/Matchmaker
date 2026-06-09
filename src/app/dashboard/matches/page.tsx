@@ -314,14 +314,14 @@ Senior Matchmaker, The Date Crew`;
                   
                   {/* Status & Score */}
                   <div className="flex items-center justify-between">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border capitalize ${
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border capitalize ${
                       match.status === 'successful'
-                        ? 'bg-emerald-950/30 border-emerald-500/20 text-emerald-400'
+                        ? 'bg-emerald-100 border-emerald-300 text-emerald-700'
                         : match.status === 'approved'
-                        ? 'bg-blue-950/30 border-blue-500/20 text-blue-400'
+                        ? 'bg-blue-100 border-blue-300 text-blue-700'
                         : match.status === 'rejected'
-                        ? 'bg-red-950/30 border-red-500/20 text-red-400'
-                        : 'bg-amber-950/30 border-amber-500/20 text-amber-400'
+                        ? 'bg-red-100 border-red-300 text-red-700'
+                        : 'bg-amber-100 border-amber-300 text-amber-700'
                     }`}>
                       {match.status === 'approved' ? 'sent' : match.status}
                     </span>
@@ -352,8 +352,8 @@ Senior Matchmaker, The Date Crew`;
 
                     {/* Bridge graphic */}
                     <div className="flex-1 flex flex-col items-center justify-center relative">
-                      <div className="h-px w-10 bg-gradient-to-r from-rose-500/30 via-violet-500/30 to-rose-500/30" />
-                      <Compass className="w-4 h-4 text-violet-400 absolute animate-spin-slow opacity-60" style={{ animationDuration: '16s' }} />
+                      <div className="h-px w-10 bg-gradient-to-r from-rose-500/30 via-pink-500/30 to-rose-500/30" />
+                      <Compass className="w-4 h-4 text-rose-400 absolute animate-spin-slow opacity-60" style={{ animationDuration: '16s' }} />
                     </div>
 
                     {/* Client B */}
@@ -435,14 +435,14 @@ Senior Matchmaker, The Date Crew`;
                         </button>
                         <button
                           onClick={() => updateMatchStatus(match.id, 'successful')}
-                          className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold shadow-md transition-all cursor-pointer"
+                          className="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[10px] font-bold shadow-md transition-all cursor-pointer"
                         >
                           Accept Match
                         </button>
                       </>
                     )}
                     {match.status === 'successful' && (
-                      <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+                      <span className="text-[10px] text-rose-400 font-bold flex items-center gap-1">
                         <Check className="w-3.5 h-3.5" /> Connected
                       </span>
                     )}
@@ -562,7 +562,7 @@ Senior Matchmaker, The Date Crew`;
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-zinc-400">Algorithmic Compatibility Fit:</span>
                     <span className={`px-2 py-0.5 rounded font-bold ${
-                      liveCompatibilityScore.score >= 80 ? 'text-emerald-400 bg-emerald-500/10' : 'text-amber-400 bg-amber-500/10'
+                      liveCompatibilityScore.score >= 80 ? 'text-rose-400 bg-rose-500/10' : 'text-pink-400 bg-pink-500/10'
                     }`}>
                       {liveCompatibilityScore.score}% Score
                     </span>
@@ -662,7 +662,7 @@ Senior Matchmaker, The Date Crew`;
                       </div>
 
                       <div className="flex flex-col items-center">
-                        <div className="h-px w-20 bg-gradient-to-r from-rose-500/30 to-violet-500/30 relative flex items-center justify-center">
+                        <div className="h-px w-20 bg-gradient-to-r from-rose-500/30 to-pink-500/30 relative flex items-center justify-center">
                           <HeartHandshake className="w-4 h-4 text-rose-500 absolute -top-2 animate-pulse" />
                         </div>
                         <span className="text-[10px] text-zinc-500 font-bold mt-2 font-mono">
@@ -728,7 +728,7 @@ Senior Matchmaker, The Date Crew`;
                   </div>
 
                   <div className="space-y-2">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-violet-400 flex items-center gap-1.5">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
                       <Brain className="w-3.5 h-3.5" />
                       Relationship Potential Analysis
                     </h4>
@@ -739,7 +739,7 @@ Senior Matchmaker, The Date Crew`;
 
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-pink-400 flex items-center gap-1.5">
                         <Mail className="w-3.5 h-3.5" />
                         Personalized Introduction Pitch
                       </h4>
@@ -748,7 +748,7 @@ Senior Matchmaker, The Date Crew`;
                         onClick={() => handleCopyText(analysisResult.introduction)}
                         className={`flex items-center gap-1 text-[10px] font-semibold transition-colors px-2 py-1 rounded-lg border cursor-pointer ${
                           copied 
-                            ? 'text-emerald-400 bg-emerald-950/20 border-emerald-500/20' 
+                            ? 'text-rose-400 bg-rose-500/10 border-rose-500/20' 
                             : 'text-zinc-400 hover:text-zinc-200 bg-zinc-900/50 border-zinc-800'
                         }`}
                       >

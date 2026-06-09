@@ -66,14 +66,14 @@ export default function DashboardOverview() {
       value: totalCustomers,
       description: `${activeCustomersCount} Active matching`,
       icon: Users,
-      color: 'text-violet-400 bg-violet-500/10 border-violet-500/25',
+      color: 'text-rose-400 bg-rose-500/10 border-rose-500/25',
     },
     {
       name: 'Matches Sent',
       value: matchesSentCount,
       description: `${matchesPendingCount} Pending review`,
       icon: UserCheck,
-      color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/25',
+      color: 'text-rose-400 bg-rose-500/10 border-rose-500/25',
     },
     {
       name: 'High Fit Matchings',
@@ -87,7 +87,7 @@ export default function DashboardOverview() {
       value: `${averageScore}%`,
       description: 'Overall pairing quality',
       icon: TrendingUp,
-      color: 'text-amber-400 bg-amber-500/10 border-amber-500/25',
+      color: 'text-rose-400 bg-rose-500/10 border-rose-500/25',
     },
   ];
 
@@ -136,7 +136,7 @@ export default function DashboardOverview() {
             </Link>
             <Link
               href="/dashboard/customers"
-              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-rose-500 to-violet-600 hover:from-rose-600 hover:to-violet-700 text-white rounded-xl text-sm font-semibold shadow-md active:scale-[0.98] transition-all"
+              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-rose-500 to-rose-400 hover:from-rose-600 hover:to-rose-500 text-white rounded-xl text-sm font-semibold shadow-md active:scale-[0.98] transition-all"
             >
               Client Directory
               <ArrowRight className="w-4 h-4" />
@@ -186,7 +186,7 @@ export default function DashboardOverview() {
               </h3>
               <p className="text-xs text-zinc-500 mt-0.5">Activity frequency of successful & sent proposals</p>
             </div>
-            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/30 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-bold text-rose-500 bg-rose-500/10 border border-rose-400/20 px-2 py-0.5 rounded-full">
               System Online
             </span>
           </div>
@@ -240,7 +240,7 @@ export default function DashboardOverview() {
         <div className="glass-panel rounded-2xl p-6 border-zinc-800/60 shadow-sm flex flex-col justify-between space-y-4">
           <div>
             <h3 className="text-base font-bold text-zinc-100 flex items-center gap-2">
-              <Award className="w-4.5 h-4.5 text-violet-400" />
+              <Award className="w-4.5 h-4.5 text-rose-400" />
               Productivity Metrics
             </h3>
             <p className="text-xs text-zinc-500 mt-0.5">Your performance logs for the current session</p>
@@ -249,7 +249,7 @@ export default function DashboardOverview() {
           <div className="space-y-4 py-2">
             <div className="flex items-center justify-between p-3.5 bg-zinc-900/40 border border-zinc-800 rounded-xl">
               <div className="flex items-center gap-2.5">
-                <ClipboardList className="w-4 h-4 text-violet-400" />
+                <ClipboardList className="w-4 h-4 text-rose-400" />
                 <span className="text-xs font-medium text-zinc-400">Notes Logged</span>
               </div>
               <span className="text-sm font-bold text-zinc-200">{totalNotesCount} notes</span>
@@ -265,7 +265,7 @@ export default function DashboardOverview() {
 
             <div className="flex items-center justify-between p-3.5 bg-zinc-900/40 border border-zinc-800 rounded-xl">
               <div className="flex items-center gap-2.5">
-                <UserCheck className="w-4 h-4 text-emerald-400" />
+                <UserCheck className="w-4 h-4 text-rose-400" />
                 <span className="text-xs font-medium text-zinc-400">Acceptance Rate</span>
               </div>
               <span className="text-sm font-bold text-zinc-200">
@@ -290,17 +290,17 @@ export default function DashboardOverview() {
         {/* Stacked Segment Bar */}
         <div className="w-full bg-zinc-900 border border-zinc-800 h-4.5 rounded-xl overflow-hidden flex shadow-inner">
           <div 
-            className="bg-emerald-500 h-full hover:brightness-110 transition-all duration-300" 
+            className="bg-rose-500 h-full hover:brightness-110 transition-all duration-300" 
             style={{ width: `${totalCustomers > 0 ? (activeCustomersCount / totalCustomers) * 100 : 0}%` }}
             title={`Active: ${activeCustomersCount}`}
           />
           <div 
-            className="bg-amber-500 h-full hover:brightness-110 transition-all duration-300" 
+            className="bg-rose-300 h-full hover:brightness-110 transition-all duration-300" 
             style={{ width: `${totalCustomers > 0 ? (pausedCustomersCount / totalCustomers) * 100 : 0}%` }}
             title={`Paused: ${pausedCustomersCount}`}
           />
           <div 
-            className="bg-rose-500 h-full hover:brightness-110 transition-all duration-300" 
+            className="bg-rose-400 h-full hover:brightness-110 transition-all duration-300" 
             style={{ width: `${totalCustomers > 0 ? (matchedCustomersCount / totalCustomers) * 100 : 0}%` }}
             title={`Matched: ${matchedCustomersCount}`}
           />
@@ -314,15 +314,15 @@ export default function DashboardOverview() {
         {/* Legend */}
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2.5 pt-1 text-xs">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded bg-emerald-500" />
+            <span className="w-2.5 h-2.5 rounded bg-rose-500" />
             <span className="text-zinc-400">Active Matching ({activeCustomersCount})</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded bg-amber-500" />
+            <span className="w-2.5 h-2.5 rounded bg-rose-300" />
             <span className="text-zinc-400">On Hold / Paused ({pausedCustomersCount})</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded bg-rose-500" />
+            <span className="w-2.5 h-2.5 rounded bg-rose-400" />
             <span className="text-zinc-400">Successfully Matched ({matchedCustomersCount})</span>
           </div>
           <div className="flex items-center gap-2">
@@ -402,10 +402,10 @@ export default function DashboardOverview() {
                       )}
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border capitalize ${
                         match.status === 'successful' 
-                          ? 'bg-emerald-950/30 border-emerald-500/20 text-emerald-400'
+                          ? 'bg-rose-500/10 border-rose-400/20 text-rose-500'
                           : match.status === 'approved'
-                          ? 'bg-blue-950/30 border-blue-500/20 text-blue-400'
-                          : 'bg-amber-950/30 border-amber-500/20 text-amber-400'
+                          ? 'bg-rose-500/10 border-rose-400/20 text-rose-400'
+                          : 'bg-zinc-500/10 border-zinc-400/20 text-zinc-400'
                       }`}>
                         {match.status}
                       </span>

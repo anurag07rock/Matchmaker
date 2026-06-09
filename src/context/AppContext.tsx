@@ -35,7 +35,7 @@ export interface SystemSettings {
     push: boolean;
     alerts: boolean;
   };
-  theme: 'dark' | 'midnight' | 'rose' | 'emerald';
+  theme: 'light' | 'dark';
   email?: string;
   phone?: string;
   avatarUrl?: string;
@@ -97,7 +97,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     name: 'Maggie Crew',
     title: 'Senior Matchmaker',
     notifications: { email: true, push: false, alerts: true },
-    theme: 'rose',
+    theme: 'light',
     email: 'maggie@thedatecrew.com',
     phone: '+1 555-0199'
   });

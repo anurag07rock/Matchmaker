@@ -67,10 +67,8 @@ export default function SettingsPage() {
   };
 
   const themesList = [
-    { id: 'dark' as const, name: 'Glassmorphic Dark (Default)', colors: 'bg-gradient-to-r from-rose-500 to-violet-600', description: 'Curated harmonic neon blurs with clean dark contrast.' },
-    { id: 'midnight' as const, name: 'Midnight Violet', colors: 'bg-gradient-to-r from-indigo-500 to-violet-600', description: 'Deep purple palette designed for low-light office work.' },
-    { id: 'rose' as const, name: 'Blushing Rose', colors: 'bg-gradient-to-r from-rose-500 to-amber-500', description: 'Warm crimson hues embodying classic relationship portals.' },
-    { id: 'emerald' as const, name: 'Emerald Slate', colors: 'bg-gradient-to-r from-emerald-500 to-teal-600', description: 'Sleek executive green layout highlighting match stability.' }
+    { id: 'light' as const, name: 'Light Mode (Default)', colors: 'bg-gradient-to-r from-rose-400 to-pink-300', description: 'Clean white canvas with blush pink and rose accents for a bright, airy feel.' },
+    { id: 'dark' as const, name: 'Dark Mode', colors: 'bg-gradient-to-r from-rose-600 to-pink-500', description: 'Deep charcoal background with vibrant rose and pink highlights for elegant depth.' }
   ];
 
   return (
@@ -78,8 +76,8 @@ export default function SettingsPage() {
       
       {/* Dynamic Toast Feedback */}
       {showSavedToast && (
-        <div className="fixed top-5 right-5 z-50 flex items-center gap-2 p-4 bg-zinc-900 border border-emerald-500/30 text-emerald-400 rounded-xl text-xs font-semibold shadow-2xl animate-slideIn select-none">
-          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+        <div className="fixed top-5 right-5 z-50 flex items-center gap-2 p-4 bg-zinc-900 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-semibold shadow-2xl animate-slideIn select-none">
+          <CheckCircle2 className="w-4 h-4 text-rose-500" />
           <span>System configuration saved successfully!</span>
         </div>
       )}
@@ -184,7 +182,7 @@ export default function SettingsPage() {
             {/* Tab 2: Matching Engine Parameters */}
             {activeTab === 'engine' && (
               <div className="glass-panel rounded-2xl p-6 border-zinc-800/60 space-y-5 shadow-sm animate-fadeIn">
-                <div className="flex items-center gap-2 text-violet-400 font-bold text-sm border-b border-zinc-900 pb-3">
+                <div className="flex items-center gap-2 text-rose-400 font-bold text-sm border-b border-zinc-900 pb-3">
                   <Sliders className="w-4.5 h-4.5" />
                   Matching Engine Parameters
                 </div>
@@ -194,7 +192,7 @@ export default function SettingsPage() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs font-semibold">
                       <span className="text-zinc-300">Maximum Search Distance Threshold</span>
-                      <span className="text-violet-400">{maxDistance} miles</span>
+                      <span className="text-rose-500">{maxDistance} miles</span>
                     </div>
                     <input
                       type="range"
@@ -210,7 +208,7 @@ export default function SettingsPage() {
                   <div className="space-y-2 border-t border-zinc-900 pt-4">
                     <div className="flex items-center justify-between text-xs font-semibold">
                       <span className="text-zinc-300">Age Bracket Tolerance Leniency</span>
-                      <span className="text-violet-400">± {ageRangeLeniency} years</span>
+                      <span className="text-rose-500">± {ageRangeLeniency} years</span>
                     </div>
                     <input
                       type="range"
@@ -245,7 +243,7 @@ export default function SettingsPage() {
             {/* Tab 3: Notifications settings */}
             {activeTab === 'notifications' && (
               <div className="glass-panel rounded-2xl p-6 border-zinc-800/60 space-y-5 shadow-sm animate-fadeIn">
-                <div className="flex items-center gap-2 text-indigo-400 font-bold text-sm border-b border-zinc-900 pb-3">
+                <div className="flex items-center gap-2 text-rose-400 font-bold text-sm border-b border-zinc-900 pb-3">
                   <Bell className="w-4.5 h-4.5" />
                   Notifications & Coordinator Alerts
                 </div>
@@ -296,7 +294,7 @@ export default function SettingsPage() {
             {/* Tab 4: Theme Settings */}
             {activeTab === 'theme' && (
               <div className="glass-panel rounded-2xl p-6 border-zinc-800/60 space-y-5 shadow-sm animate-fadeIn">
-                <div className="flex items-center gap-2 text-amber-400 font-bold text-sm border-b border-zinc-900 pb-3">
+                <div className="flex items-center gap-2 text-rose-400 font-bold text-sm border-b border-zinc-900 pb-3">
                   <Palette className="w-4.5 h-4.5" />
                   Appearance & Design Presets
                 </div>
@@ -339,7 +337,7 @@ export default function SettingsPage() {
 
               <button
                 type="submit"
-                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-rose-500 to-violet-600 hover:from-rose-600 hover:to-violet-700 text-white rounded-xl text-sm font-semibold active:scale-[0.98] transition-all shadow-md cursor-pointer"
+                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-rose-500 to-rose-400 hover:from-rose-600 hover:to-rose-500 text-white rounded-xl text-sm font-semibold active:scale-[0.98] transition-all shadow-md cursor-pointer"
               >
                 <Save className="w-4 h-4" />
                 Save Configurations
