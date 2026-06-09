@@ -1,8 +1,8 @@
 import bcrypt from 'bcryptjs';
 import { initDb, query } from './connection';
 import { createSchema } from './schema';
-import { mockCustomers } from '../../../src/data/customers';
-import { mockMatches } from '../../../src/data/matches';
+import { mockCustomers } from '../data/customers';
+import { mockMatches } from '../data/matches';
 
 const PRESET_USERS = [
   {
@@ -79,8 +79,8 @@ export async function seed() {
     let custCount = 0;
     for (const c of mockCustomers) {
       // Add dynamic horoscope and verificationStatus
-      const hIndex = Math.abs(c.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % HOROSCOPES.length;
-      const vIndex = Math.abs(c.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % VERIFICATION_STATUSES.length;
+      const hIndex = Math.abs(c.id.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0)) % HOROSCOPES.length;
+      const vIndex = Math.abs(c.id.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0)) % VERIFICATION_STATUSES.length;
       
       const horoscope = c.horoscope || HOROSCOPES[hIndex];
       const verificationStatus = c.verificationStatus || VERIFICATION_STATUSES[vIndex];
