@@ -103,234 +103,187 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   });
   const [initialized, setInitialized] = useState(false);
 
-  // Load state from localStorage on mount
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+
+  // Load state from backend on mount
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const storedCustomers = localStorage.getItem('matchmaker_customers');
-      const storedMatches = localStorage.getItem('matchmaker_matches');
-      const storedActivities = localStorage.getItem('matchmaker_activities');
-      const storedSettings = localStorage.getItem('matchmaker_settings');
-
-      if (storedCustomers) {
-        setCustomers(JSON.parse(storedCustomers));
-      } else {
-        // Seed default notes into JSON format for initial customers to avoid parsing legacy logs
-        const seededInitial = initialCustomers.map(c => {
-          if (c.internalNotes && c.internalNotes.length > 0) {
-            const parsed = c.internalNotes.map((n, i) => JSON.stringify({
-              id: `note_seed_${c.id}_${i}`,
-              text: n,
-              createdAt: c.updatedAt || c.createdAt,
-              author: 'Maggie Crew (Senior Matchmaker)'
-            }));
-            return { ...c, internalNotes: parsed };
+    async function loadData() {
+      try {
+        // 1. Fetch settings from local storage
+        if (typeof window !== 'undefined') {
+          const storedSettings = localStorage.getItem('matchmaker_settings');
+          if (storedSettings) {
+            setSettings(JSON.parse(storedSettings));
           }
-          return c;
-        });
-        setCustomers(seededInitial);
-        localStorage.setItem('matchmaker_customers', JSON.stringify(seededInitial));
-      }
+        }
 
-      if (storedMatches) {
-        setMatches(JSON.parse(storedMatches));
-      } else {
-        setMatches(initialMatches);
-        localStorage.setItem('matchmaker_matches', JSON.stringify(initialMatches));
-      }
+        // 2. Fetch customers from API
+        const custRes = await fetch(`${API_URL}/customers`);
+        if (custRes.ok) {
+          const custData = await custRes.json();
+          setCustomers(custData);
+        }
 
-      if (storedActivities) {
-        setActivities(JSON.parse(storedActivities));
-      } else {
-        // Seed initial mock activities for realistic dashboard on first open
-        const initialActivities: ActivityItem[] = [
-          {
-            id: 'act_01',
-            type: 'customer_added',
-            timestamp: new Date(Date.now() - 3600000 * 24 * 3).toISOString(), // 3 days ago
-            customerId: 'cust_01',
-            customerName: 'Alexander Wright',
-            details: 'Profile onboarding completed.'
-          },
-          {
-            id: 'act_02',
-            type: 'match_suggested',
-            timestamp: new Date(Date.now() - 3600000 * 24 * 2).toISOString(), // 2 days ago
-            customerId: 'cust_01',
-            customerName: 'Alexander Wright',
-            details: 'Algorithmic recommendation generated with Sophia Chen.'
-          },
-          {
-            id: 'act_03',
-            type: 'note_added',
-            timestamp: new Date(Date.now() - 3600000 * 5).toISOString(), // 5 hours ago
-            customerId: 'cust_02',
-            customerName: 'Sophia Chen',
-            details: 'Interview note added: Expresses strong desire for a creative partner.'
-          }
-        ];
-        setActivities(initialActivities);
-        localStorage.setItem('matchmaker_activities', JSON.stringify(initialActivities));
-      }
+        // 3. Fetch matches from API
+        const matchesRes = await fetch(`${API_URL}/matches`);
+        if (matchesRes.ok) {
+          const matchesData = await matchesRes.json();
+          setMatches(matchesData);
+        }
 
-      if (storedSettings) {
-        setSettings(JSON.parse(storedSettings));
-      } else {
-        localStorage.setItem('matchmaker_settings', JSON.stringify(settings));
+        // 4. Fetch activities from API
+        const actRes = await fetch(`${API_URL}/activities`);
+        if (actRes.ok) {
+          const actData = await actRes.json();
+          setActivities(actData);
+        }
+      } catch (err) {
+        console.error('Failed to load data from backend server:', err);
+      } finally {
+        setInitialized(true);
       }
-
-      setInitialized(true);
     }
-  }, []);
 
-  // Save changes helper
-  const saveCustomers = (updated: Customer[]) => {
-    setCustomers(updated);
-    localStorage.setItem('matchmaker_customers', JSON.stringify(updated));
-  };
+    loadData();
+  }, [API_URL]);
 
-  const saveMatches = (updated: Match[]) => {
-    setMatches(updated);
-    localStorage.setItem('matchmaker_matches', JSON.stringify(updated));
-  };
+  // Refresh helper functions
+  const refreshData = async () => {
+    try {
+      const [custRes, matchesRes, actRes] = await Promise.all([
+        fetch(`${API_URL}/customers`),
+        fetch(`${API_URL}/matches`),
+        fetch(`${API_URL}/activities`)
+      ]);
 
-  const logActivity = (
-    type: ActivityItem['type'],
-    customerId: string,
-    customerName: string,
-    details: string
-  ) => {
-    const newActivity: ActivityItem = {
-      id: `act_${Date.now()}`,
-      type,
-      timestamp: new Date().toISOString(),
-      customerId,
-      customerName,
-      details
-    };
-    const updated = [newActivity, ...activities];
-    setActivities(updated);
-    localStorage.setItem('matchmaker_activities', JSON.stringify(updated));
+      if (custRes.ok) setCustomers(await custRes.json());
+      if (matchesRes.ok) setMatches(await matchesRes.json());
+      if (actRes.ok) setActivities(await actRes.json());
+    } catch (err) {
+      console.error('Failed to refresh data:', err);
+    }
   };
 
   // 1. Add Customer (Onboarding)
   const addCustomer = (customerData: Omit<Customer, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const id = `cust_${Date.now()}`;
+    const tempId = `cust_${Date.now()}`;
     const newCustomer: Customer = {
       ...customerData,
-      id,
+      id: tempId,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
+      internalNotes: []
     };
-    const updated = [newCustomer, ...customers];
-    saveCustomers(updated);
-    logActivity('customer_added', id, `${newCustomer.firstName} ${newCustomer.lastName}`, 'New client onboarding form submitted.');
+
+    // Optimistic update
+    setCustomers(prev => [newCustomer, ...prev]);
+
+    // Async save
+    fetch(`${API_URL}/customers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newCustomer)
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Onboarding failed');
+        return res.json();
+      })
+      .then(saved => {
+        setCustomers(prev => prev.map(c => c.id === tempId ? saved : c));
+        refreshData();
+      })
+      .catch(err => {
+        console.error('Add customer error:', err);
+        refreshData();
+      });
+
     return newCustomer;
   };
 
   // 2. Update Customer status
   const updateCustomerStatus = (customerId: string, status: CustomerStatus) => {
-    const updated = customers.map(c => {
-      if (c.id === customerId) {
-        return { ...c, status, updatedAt: new Date().toISOString() };
-      }
-      return c;
-    });
-    saveCustomers(updated);
-    const updatedCustomer = updated.find(c => c.id === customerId);
-    if (updatedCustomer) {
-      logActivity(
-        'profile_updated',
-        customerId,
-        `${updatedCustomer.firstName} ${updatedCustomer.lastName}`,
-        `CRM status updated to "${status}".`
-      );
-    }
+    setCustomers(prev => prev.map(c => c.id === customerId ? { ...c, status, updatedAt: new Date().toISOString() } : c));
+
+    fetch(`${API_URL}/customers/${customerId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Status update failed');
+        refreshData();
+      })
+      .catch(err => {
+        console.error('Update status error:', err);
+        refreshData();
+      });
   };
 
   // 3. Update Customer Profile fields
   const updateCustomerProfile = (customerId: string, updatedData: Partial<Customer>) => {
-    const updated = customers.map(c => {
-      if (c.id === customerId) {
-        return { ...c, ...updatedData, updatedAt: new Date().toISOString() };
-      }
-      return c;
-    });
-    saveCustomers(updated);
-    const updatedCustomer = updated.find(c => c.id === customerId);
-    if (updatedCustomer) {
-      logActivity(
-        'profile_updated',
-        customerId,
-        `${updatedCustomer.firstName} ${updatedCustomer.lastName}`,
-        'Dossier details updated.'
-      );
-    }
+    setCustomers(prev => prev.map(c => c.id === customerId ? { ...c, ...updatedData, updatedAt: new Date().toISOString() } : c));
+
+    fetch(`${API_URL}/customers/${customerId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedData)
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Profile update failed');
+        refreshData();
+      })
+      .catch(err => {
+        console.error('Update profile error:', err);
+        refreshData();
+      });
   };
 
   // 4. Notes management (Add, edit, delete)
   const addNote = (customerId: string, noteText: string) => {
-    const noteId = `note_${Date.now()}`;
-    const newRichNote: RichNote = {
-      id: noteId,
-      text: noteText,
-      createdAt: new Date().toISOString(),
-      author: `${settings.name} (${settings.title})`
-    };
-    const updated = customers.map(c => {
-      if (c.id === customerId) {
-        const currentNotes = c.internalNotes || [];
-        return {
-          ...c,
-          internalNotes: [...currentNotes, JSON.stringify(newRichNote)],
-          updatedAt: new Date().toISOString()
-        };
-      }
-      return c;
-    });
-    saveCustomers(updated);
-    const client = customers.find(c => c.id === customerId);
-    if (client) {
-      logActivity('note_added', customerId, `${client.firstName} ${client.lastName}`, `Note logged: "${noteText.slice(0, 40)}${noteText.length > 40 ? '...' : ''}"`);
-    }
+    fetch(`${API_URL}/notes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customerId,
+        text: noteText,
+        author: `${settings.name} (${settings.title})`
+      })
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to create note');
+        refreshData();
+      })
+      .catch(err => {
+        console.error('Add note error:', err);
+      });
   };
 
   const editNote = (customerId: string, noteId: string, newText: string) => {
-    const updated = customers.map(c => {
-      if (c.id === customerId) {
-        const currentNotes = c.internalNotes || [];
-        const richNotes = parseNotes(currentNotes);
-        const updatedRichNotes = richNotes.map(n => {
-          if (n.id === noteId) {
-            return { ...n, text: newText, createdAt: new Date().toISOString() };
-          }
-          return n;
-        });
-        return {
-          ...c,
-          internalNotes: updatedRichNotes.map(n => JSON.stringify(n)),
-          updatedAt: new Date().toISOString()
-        };
-      }
-      return c;
-    });
-    saveCustomers(updated);
+    fetch(`${API_URL}/notes/${noteId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: newText })
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to update note');
+        refreshData();
+      })
+      .catch(err => {
+        console.error('Edit note error:', err);
+      });
   };
 
   const deleteNote = (customerId: string, noteId: string) => {
-    const updated = customers.map(c => {
-      if (c.id === customerId) {
-        const currentNotes = c.internalNotes || [];
-        const richNotes = parseNotes(currentNotes);
-        const filteredRichNotes = richNotes.filter(n => n.id !== noteId);
-        return {
-          ...c,
-          internalNotes: filteredRichNotes.map(n => JSON.stringify(n)),
-          updatedAt: new Date().toISOString()
-        };
-      }
-      return c;
-    });
-    saveCustomers(updated);
+    fetch(`${API_URL}/notes/${noteId}`, {
+      method: 'DELETE'
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to delete note');
+        refreshData();
+      })
+      .catch(err => {
+        console.error('Delete note error:', err);
+      });
   };
 
   // 5. Match Proposing
@@ -339,11 +292,10 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const candidate = customers.find(c => c.id === proposedMatchId);
     if (!client || !candidate) return null;
 
-    // Calculate compatibility
     const comp = calculateCompatibility(client, candidate);
-
+    const tempMatchId = `match_${Date.now()}`;
     const newMatch: Match = {
-      id: `match_${Date.now()}`,
+      id: tempMatchId,
       customerId,
       proposedMatchId,
       status: 'proposed',
@@ -359,74 +311,90 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       updatedAt: new Date().toISOString()
     };
 
-    const updated = [newMatch, ...matches];
-    saveMatches(updated);
+    setMatches(prev => [newMatch, ...prev]);
 
-    logActivity(
-      'match_suggested',
-      customerId,
-      `${client.firstName} & ${candidate.firstName}`,
-      `Match pairing proposed with compatibility score of ${comp.score}%.`
-    );
+    fetch(`${API_URL}/matches/propose`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customerId,
+        proposedMatchId,
+        matchmakerNotes: notes,
+        aiReport: newMatch.aiReport
+      })
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Match proposal failed');
+        return res.json();
+      })
+      .then(saved => {
+        setMatches(prev => prev.map(m => m.id === tempMatchId ? saved : m));
+        refreshData();
+      })
+      .catch(err => {
+        console.error('Propose match error:', err);
+        refreshData();
+      });
 
     return newMatch;
   };
 
   // 6. Update Match status
   const updateMatchStatus = (matchId: string, status: MatchStatus) => {
-    const updated = matches.map(m => {
-      if (m.id === matchId) {
-        return { ...m, status, updatedAt: new Date().toISOString() };
-      }
-      return m;
-    });
-    saveMatches(updated);
+    setMatches(prev => prev.map(m => m.id === matchId ? { ...m, status, updatedAt: new Date().toISOString() } : m));
 
-    const matchObj = matches.find(m => m.id === matchId);
-    if (matchObj) {
-      const client = customers.find(c => c.id === matchObj.customerId);
-      const candidate = customers.find(c => c.id === matchObj.proposedMatchId);
-      if (client && candidate) {
-        let details = `Match status changed to ${status}.`;
-        if (status === 'successful') {
-          details = 'Match finalized! Both clients successfully matched.';
-        } else if (status === 'rejected') {
-          details = 'Match pairing closed.';
-        }
-        logActivity('profile_updated', client.id, `${client.firstName} & ${candidate.firstName}`, details);
-      }
-    }
+    fetch(`${API_URL}/matches/${matchId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Match status update failed');
+        refreshData();
+      })
+      .catch(err => {
+        console.error('Update match status error:', err);
+        refreshData();
+      });
   };
 
   // 7. Delete Match
   const deleteMatch = (matchId: string) => {
-    const updated = matches.filter(m => m.id !== matchId);
-    saveMatches(updated);
+    setMatches(prev => prev.filter(m => m.id !== matchId));
+
+    fetch(`${API_URL}/matches/${matchId}`, {
+      method: 'DELETE'
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Match deletion failed');
+        refreshData();
+      })
+      .catch(err => {
+        console.error('Delete match error:', err);
+        refreshData();
+      });
   };
 
   // 8. Send Match recommendation
   const sendMatchRecommendation = (matchId: string, subject: string, body: string) => {
-    const updated = matches.map(m => {
-      if (m.id === matchId) {
-        return { ...m, status: 'approved' as MatchStatus, updatedAt: new Date().toISOString() }; // Mark as sent/approved
-      }
-      return m;
-    });
-    saveMatches(updated);
+    setMatches(prev => prev.map(m => m.id === matchId ? { ...m, status: 'approved' as MatchStatus, updatedAt: new Date().toISOString() } : m));
 
-    const matchObj = matches.find(m => m.id === matchId);
-    if (matchObj) {
-      const client = customers.find(c => c.id === matchObj.customerId);
-      const candidate = customers.find(c => c.id === matchObj.proposedMatchId);
-      if (client && candidate) {
-        logActivity(
-          'match_sent',
-          client.id,
-          `${client.firstName} ${client.lastName}`,
-          `Recommendation email sent regarding match candidate ${candidate.firstName} ${candidate.lastName}.`
-        );
-      }
-    }
+    fetch(`${API_URL}/matches/send`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        matchId,
+        timestamp: new Date().toISOString()
+      })
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to record match recommendation event');
+        refreshData();
+      })
+      .catch(err => {
+        console.error('Send match recommendation error:', err);
+        refreshData();
+      });
   };
 
   // 9. Update settings

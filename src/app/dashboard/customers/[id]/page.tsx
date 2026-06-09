@@ -160,6 +160,8 @@ export default function CustomerDetailPage({ params }: PageProps) {
     { label: 'Caste / Community', value: client.caste || 'N/A' },
     { label: 'Mother Tongue', value: client.motherTongue },
     { label: 'Languages Spoken', value: client.languages.join(', ') },
+    { label: 'Horoscope / Rashi', value: client.horoscope || 'N/A' },
+    { label: 'Verification Status', value: client.verificationStatus || 'Pending' },
     { label: 'Self Introduction / Bio', value: client.bio, isFullWidth: true },
   ];
 

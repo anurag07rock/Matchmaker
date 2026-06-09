@@ -65,4 +65,7 @@ export interface Customer {
   wantKids: 'yes' | 'no' | 'open';      // Added for Day 2 compliance
   matchPreferences: MatchPreferences;
   internalNotes?: string[]; // Matchmaker internal notes
+  horoscope?: string;
+  verificationStatus?: 'verified' | 'pending' | 'unverified' | string;
 }
+

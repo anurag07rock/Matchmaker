@@ -153,55 +153,48 @@ export default function DashboardLayout({
     setIsLoading(true);
     setError('');
 
-    setTimeout(() => {
-      const query = emailOrPhone.trim().toLowerCase();
-      const queryPhone = cleanPhone(emailOrPhone);
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 
-      // 1. Search in preset list
-      const matchedPreset = PRESET_ACCOUNTS.find(
-        (acc) =>
-          acc.email.toLowerCase() === query ||
-          (queryPhone && cleanPhone(acc.phone) === queryPhone)
-      );
-
-      // 2. Search in custom registered list
-      const matchedCustom = customAccounts.find(
-        (acc) =>
-          acc.email.toLowerCase() === query ||
-          (queryPhone && cleanPhone(acc.phone) === queryPhone)
-      );
-
-      const account = matchedPreset || matchedCustom;
-
-      if (account) {
-        // Account exists, verify password
-        if (account.password === password) {
-          // Save active settings to AppContext localStorage
-          const updatedSettings = {
-            promptTone: 'detailed and analytical',
-            maxDistance: 50,
-            ageRangeLeniency: 2,
-            apiKey: '••••••••••••••••••••••••••••••••',
-            name: account.name,
-            title: account.title,
-            notifications: { email: true, push: false, alerts: true },
-            theme: account.theme,
-            email: account.email,
-            phone: account.phone
-          };
-          localStorage.setItem('matchmaker_settings', JSON.stringify(updatedSettings));
-          document.cookie = "auth_session=true; path=/; max-age=86400; SameSite=Lax";
-          window.location.reload();
-        } else {
-          setError('Security password mismatch. Please verify and try again.');
-          setIsLoading(false);
+    fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ emailOrPhone, password })
+    })
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) {
+          if (res.status === 404) {
+            setShowRegister(true);
+            setIsLoading(false);
+          } else {
+            setError(data.error || 'Security password mismatch. Please verify and try again.');
+            setIsLoading(false);
+          }
+          return;
         }
-      } else {
-        // Account does not exist, trigger Registration mode
-        setShowRegister(true);
+
+        const user = data.user;
+        const updatedSettings = {
+          promptTone: 'detailed and analytical',
+          maxDistance: 50,
+          ageRangeLeniency: 2,
+          apiKey: '••••••••••••••••••••••••••••••••',
+          name: user.name,
+          title: user.title,
+          notifications: { email: true, push: false, alerts: true },
+          theme: user.theme || 'light',
+          email: user.email,
+          phone: user.phone
+        };
+        localStorage.setItem('matchmaker_settings', JSON.stringify(updatedSettings));
+        document.cookie = "auth_session=true; path=/; max-age=86400; SameSite=Lax";
+        window.location.reload();
+      })
+      .catch((err) => {
+        console.error('Login error:', err);
+        setError('Failed to connect to authentication server. Please ensure the server is active.');
         setIsLoading(false);
-      }
-    }, 1000);
+      });
   };
 
   const handleRegisterSubmit = (e: React.FormEvent) => {
@@ -214,42 +207,54 @@ export default function DashboardLayout({
     setIsLoading(true);
     setError('');
 
-    setTimeout(() => {
-      const query = emailOrPhone.trim();
-      const isEmail = query.includes('@');
-      
-      const newAccount: MatchmakerAccount = {
-        email: isEmail ? query.toLowerCase() : `${newName.toLowerCase().replace(/\s+/g, '')}@thedatecrew.com`,
-        phone: isEmail ? '+1 555-0100' : query,
-        password: password,
-        name: newName,
-        title: newTitle || 'Matchmaking Agent',
-        theme: newTheme
-      };
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+    const queryStr = emailOrPhone.trim();
+    const isEmail = queryStr.includes('@');
 
-      // Save to custom accounts
-      const updatedCustom = [...customAccounts, newAccount];
-      setCustomAccounts(updatedCustom);
-      localStorage.setItem('matchmaker_custom_accounts', JSON.stringify(updatedCustom));
+    const payload = {
+      email: isEmail ? queryStr.toLowerCase() : `${newName.toLowerCase().replace(/\s+/g, '')}@thedatecrew.com`,
+      phone: isEmail ? '+1 555-0100' : queryStr,
+      password: password,
+      name: newName,
+      title: newTitle || 'Matchmaking Agent',
+      theme: newTheme
+    };
 
-      // Save active settings to AppContext localStorage
-      const updatedSettings = {
-        promptTone: 'detailed and analytical',
-        maxDistance: 50,
-        ageRangeLeniency: 2,
-        apiKey: '••••••••••••••••••••••••••••••••',
-        name: newAccount.name,
-        title: newAccount.title,
-        notifications: { email: true, push: false, alerts: true },
-        theme: newAccount.theme,
-        email: newAccount.email,
-        phone: newAccount.phone
-      };
-      localStorage.setItem('matchmaker_settings', JSON.stringify(updatedSettings));
-      
-      document.cookie = "auth_session=true; path=/; max-age=86400; SameSite=Lax";
-      window.location.reload();
-    }, 1200);
+    fetch(`${API_URL}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data.error || 'Registration failed.');
+          setIsLoading(false);
+          return;
+        }
+
+        const user = data.user;
+        const updatedSettings = {
+          promptTone: 'detailed and analytical',
+          maxDistance: 50,
+          ageRangeLeniency: 2,
+          apiKey: '••••••••••••••••••••••••••••••••',
+          name: user.name,
+          title: user.title,
+          notifications: { email: true, push: false, alerts: true },
+          theme: user.theme || 'light',
+          email: user.email,
+          phone: user.phone
+        };
+        localStorage.setItem('matchmaker_settings', JSON.stringify(updatedSettings));
+        document.cookie = "auth_session=true; path=/; max-age=86400; SameSite=Lax";
+        window.location.reload();
+      })
+      .catch((err) => {
+        console.error('Registration error:', err);
+        setError('Failed to connect to authentication server.');
+        setIsLoading(false);
+      });
   };
 
   const autofill = (acc: MatchmakerAccount) => {
